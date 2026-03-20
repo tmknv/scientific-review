@@ -1,0 +1,16 @@
+[project]
+name = "scientific_review"
+version = "1.0.0"
+description = "Сравнительный анализ мультиагентной системы и большой языковой модели в задаче автоматического рецензирования научных текстов"
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+license = {text = "apache 2.0"}
+requires-python = ">=3.10"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
