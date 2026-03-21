@@ -1,54 +1,47 @@
-import uuid
 import time
+import uuid
+from pathlib import Path
+
 from scientific_review.llm.client import LLMClient
 from scientific_review.utils.parser import extract_json
-
-def load_prompt(path):
-    with open(path, "r") as f:
-        return f.read()
 
 
 class BaselinePipeline:
     def __init__(self):
         self.client = LLMClient()
+        self.prompt = Path("scientific_review/prompts/baseline.txt").read_text(encoding="utf-8")
 
-        self.prompt_template = load_prompt(
-            "scientific_review/prompts/baseline.txt"
-        )
-
-    def run(self, text: str, paper_id: str = None):
-        run_id = str(uuid.uuid4())
-        start = time.time()
-
-        prompt = self.prompt_template.replace("{{TEXT}}", text)
-
+    def run(self, text, paper_id=None):
+        start = time.perf_counter()
+        prompt = self.prompt.replace("{{TEXT}}", text)
         response = self.client.generate(prompt)
+        data = extract_json(response["text"])
 
-        parsed = extract_json(response["text"])
-
-        latency = time.time() - start
-
-        result = {
+        return {
             "paper_id": paper_id or "unknown",
             "mode": "baseline",
-            "scores": parsed.get("scores", {}),
-            "verdict": parsed.get("verdict"),
-            "review": parsed.get("review"),
-            "strengths": parsed.get("strengths", []),
-            "weaknesses": parsed.get("weaknesses", []),
-            "suggestions": parsed.get("suggestions", []),
-            "bias_risks": parsed.get("bias_risks", []),
-            "explanations": parsed.get("explanations", {}),
+            "scores": data["scores"],
+            "verdict": data["verdict"],
+            "strengths": data.get("strengths", []),
+            "weaknesses": data.get("weaknesses", []),
+            "suggestions": data.get("suggestions", []),
+            "bias_risks": data.get("bias_risks", []),
+            "explanations": data.get("explanations", {}),
+            "criterion_comments": {},
+            "review": data.get("review", ""),
+            "review_consistency": None,
+            "agents_outputs": [],
             "model_info": {
-                "baseline_model": self.client.model,
+                "baseline_model": "qwen/qwen3-4b"
             },
             "runtime_info": {
-                "latency": latency,
-                "token_usage": response.get("usage", {}),
-                "run_id": run_id,
-                "timestamp": time.time(),
+                "latency": round(time.perf_counter() - start, 4),
+                "usage": response["usage"],
+                "cache_hit": False,
+                "run_id": str(uuid.uuid4())
             },
-            "raw_output": response["text"],
+            "raw_output": response["text"]
         }
 
-        return result
+    def close(self):
+        self.client.close()

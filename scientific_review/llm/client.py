@@ -1,36 +1,25 @@
-# llm/client.py
-import httpx
 import time
-from typing import Dict, Any
+import requests
 
 from scientific_review.config.settings import settings
 
 
 class LLMClient:
-    def __init__(
-        self,
-        model: str | None = None,
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-        timeout: float | None = None,
-    ):
+    def __init__(self, model=None, temperature=None, max_tokens=None, timeout=None):
         self.model = model or settings.DEFAULT_MODEL
-        self.temperature = temperature or settings.TEMPERATURE
-        self.max_tokens = max_tokens or settings.MAX_TOKENS
-        self.timeout = timeout or settings.TIMEOUT
+        self.temperature = temperature if temperature is not None else settings.TEMPERATURE
+        self.max_tokens = max_tokens if max_tokens is not None else settings.MAX_TOKENS
+        self.timeout = timeout if timeout is not None else settings.TIMEOUT
 
-        self.api_key = settings.OPENROUTER_API_KEY
-        self.base_url = "https://openrouter.ai/api/v1"
-
-        self.client = httpx.AsyncClient(
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
+        self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
                 "Content-Type": "application/json",
-            },
-            timeout=self.timeout,
+            }
         )
 
-    async def generate(self, prompt: str) -> Dict[str, Any]:
+    def generate(self, prompt):
         start = time.perf_counter()
 
         payload = {
@@ -40,25 +29,19 @@ class LLMClient:
             "max_tokens": self.max_tokens,
         }
 
-        try:
-            resp = await self.client.post(
-                f"{self.base_url}/chat/completions",
-                json=payload,
-            )
-            resp.raise_for_status()
-            data = resp.json()
+        response = self.session.post(
+            f"{settings.OPENROUTER_BASE_URL}/chat/completions",
+            json=payload,
+            timeout=self.timeout,
+        )
+        response.raise_for_status()
+        data = response.json()
 
-            text = data["choices"][0]["message"]["content"]
-            latency = time.perf_counter() - start
+        return {
+            "text": data["choices"][0]["message"]["content"],
+            "usage": data.get("usage", {}),
+            "latency": round(time.perf_counter() - start, 4),
+        }
 
-            return {
-                "text": text,
-                "latency": latency,
-                "usage": data.get("usage", {}),
-            }
-
-        except httpx.HTTPError as e:
-            raise RuntimeError(f"LLM request failed: {e}") from e
-
-    async def close(self):
-        await self.client.aclose()
+    def close(self):
+        self.session.close()

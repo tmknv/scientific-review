@@ -1,0 +1,14 @@
+criteria:
+  novelty: "qwen/qwen3-4b"
+  scientificity: "qwen/qwen3-4b"
+  readability: "qwen/qwen3-4b"
+  complexity: "qwen/qwen3-4b"
+
+review:
+  draft: "qwen/qwen3-4b"
+  critic: "qwen/qwen3-4b"
+  editor: "qwen/qwen3-4b"
+  final: "qwen/qwen3-4b"
+  consistency: "qwen/qwen3-4b"
+
+baseline: "qwen/qwen3-4b"

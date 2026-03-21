@@ -1,27 +1,30 @@
 def aggregate(state):
-    scores = state.scores
+    scores = state.get("scores", {})
+    avg_score = sum(scores.values()) / len(scores)
 
-    if not scores:
-        raise ValueError("No scores to aggregate")
-
-    final_score = sum(scores.values()) / len(scores)
-
-    if final_score >= 7:
+    if avg_score >= 7:
         verdict = "accept"
-    elif final_score >= 4:
+    elif avg_score >= 4:
         verdict = "revise"
     else:
         verdict = "reject"
 
-    result = {
+    return {
+        "paper_id": state.get("paper_id", "unknown"),
+        "mode": state.get("mode", "multiagent"),
         "scores": {
             **scores,
-            "final_score": round(final_score, 2),
+            "final_score": round(avg_score, 2),
         },
-        "explanations": state.explanations,
-        "review": state.review_final or "",
         "verdict": verdict,
-        "agents_outputs": state.agent_outputs,
+        "strengths": state.get("strengths", []),
+        "weaknesses": state.get("weaknesses", []),
+        "suggestions": state.get("suggestions", []),
+        "bias_risks": state.get("bias_risks", []),
+        "explanations": state.get("explanations", {}),
+        "criterion_comments": state.get("comments", {}),
+        "review": state.get("review_final", "") or state.get("review_refined", "") or state.get("review_draft", ""),
+        "review_consistency": state.get("review_consistency"),
+        "agents_outputs": state.get("agents_outputs", []),
+        "raw_output": state.get("raw_output"),
     }
-
-    return result
