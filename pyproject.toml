@@ -8,6 +8,8 @@ authors = [
 license = {text = "apache 2.0"}
 requires-python = ">=3.10"
 dependencies = [
+    "requests (>=2.32.5,<3.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)"
 ]
 
 
