@@ -6,8 +6,9 @@ import random
 from aiogram import Router, F
 from aiogram.types import (
     Message, CallbackQuery, FSInputFile,
-    ReplyKeyboardRemove, InlineKeyboardBuilder
+    ReplyKeyboardRemove,
 )
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 from ..client import AnalysisClient
 

@@ -1,8 +1,8 @@
 # bot/bot.py
-import asyncio
 import logging
-import os
-from dotenv import load_dotenv
+import asyncio
+from ..config.settings import settings
+
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -12,13 +12,7 @@ from .handlers.start import router as start_router
 from .handlers.upload import router as upload_router
 from .handlers.states import UserStates
 
-load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-if not BOT_TOKEN:
-    raise ValueError("Установите BOT_TOKEN в .env файле!")
-
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token= settings.TG_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 

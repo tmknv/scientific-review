@@ -4,6 +4,7 @@ import os
 load_dotenv()
 
 class Settings:
+    TG_TOKEN:str = os.getenv("TG_TOKEN")
     OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY")
     DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "qwen/qwen3-4b")
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", 0.3))
@@ -12,7 +13,7 @@ class Settings:
 
 settings = Settings()
 
-TG_TOKEN = os.getenv("TG_TOKEN")
 
-if not settings.OPENROUTER_API_KEY:
-    raise ValueError("OPENROUTER_API_KEY is not set")
+
+# if not settings.OPENROUTER_API_KEY:
+#     raise ValueError("OPENROUTER_API_KEY is not set")
