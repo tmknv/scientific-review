@@ -1,54 +1,64 @@
-import os
+# llm/client.py
+import httpx
 import time
-import requests
+from typing import Dict, Any
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+from scientific_review.config.settings import settings
+
 
 class LLMClient:
     def __init__(
         self,
-        model="qwen/qwen3-4b",
-        temperature=0.3,
-        max_tokens=1500,
-        timeout=60,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        timeout: float | None = None,
     ):
-        self.model = model
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        self.timeout = timeout
+        self.model = model or settings.DEFAULT_MODEL
+        self.temperature = temperature or settings.TEMPERATURE
+        self.max_tokens = max_tokens or settings.MAX_TOKENS
+        self.timeout = timeout or settings.TIMEOUT
 
-    def generate(self, prompt: str):
-        start = time.time()
+        self.api_key = settings.OPENROUTER_API_KEY
+        self.base_url = "https://openrouter.ai/api/v1"
 
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
+        self.client = httpx.AsyncClient(
             headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
-            },
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": self.temperature,
-                "max_tokens": self.max_tokens,
             },
             timeout=self.timeout,
         )
 
-        latency = time.time() - start
+    async def generate(self, prompt: str) -> Dict[str, Any]:
+        start = time.perf_counter()
 
-        if response.status_code != 200:
-            raise RuntimeError(f"LLM error: {response.text}")
-
-        data = response.json()
-        text = data["choices"][0]["message"]["content"]
-
-        usage = data.get("usage", {})
-
-        return {
-            "text": text,
-            "latency": latency,
-            "usage": usage,
+        payload = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
         }
+
+        try:
+            resp = await self.client.post(
+                f"{self.base_url}/chat/completions",
+                json=payload,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+            text = data["choices"][0]["message"]["content"]
+            latency = time.perf_counter() - start
+
+            return {
+                "text": text,
+                "latency": latency,
+                "usage": data.get("usage", {}),
+            }
+
+        except httpx.HTTPError as e:
+            raise RuntimeError(f"LLM request failed: {e}") from e
+
+    async def close(self):
+        await self.client.aclose()

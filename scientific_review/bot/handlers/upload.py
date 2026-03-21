@@ -22,3 +22,19 @@ async def handle_pdf(message: Message):
             result = await resp.json()
 
     await message.answer(format_result(result))
+
+
+def format_result(result):
+    scores = result["scores"]
+
+    return f"""
+📊 Оценка статьи:
+
+Новизна: {scores['novelty']}
+Научность: {scores['scientific']}
+Сложность: {scores['complexity']}
+Читаемость: {scores['readability']}
+
+📝 Ревью:
+{result['review']}
+"""
