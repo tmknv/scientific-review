@@ -1,11 +1,16 @@
 from scientific_review.llm.client import LLMClient  
 from scientific_review.utils.parser import extract_json
 from scientific_review.agents.state import ReviewState  
+from scientific_review.config.settings import MODELS
 
 
 class NoveltyAgent:
     def __init__(self) -> None:
-        self.client = LLMClient()
+        self.client = LLMClient(
+            model=MODELS["criteria"]["novelty"],
+            temperature=0.15,
+            max_tokens=800
+        )
         with open("scientific_review/prompts/agents/novelty.txt") as f:
             self.prompt_template = f.read()
 

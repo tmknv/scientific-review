@@ -1,6 +1,7 @@
 from scientific_review.llm.client import LLMClient 
 from scientific_review.utils.parser import extract_json
 from scientific_review.agents.state import ReviewState 
+from scientific_review.config.settings import MODELS
 
 
 class ReadabilityAgent:
