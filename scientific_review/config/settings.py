@@ -1,23 +1,14 @@
-from dotenv import load_dotenv
 import os
-import yaml
+from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Settings:
-    OPENROUTER_API_KEY: str | None = os.getenv("OPENROUTER_API_KEY")
-    TG_TOKEN: str | None = os.getenv("TG_TOKEN")
+    def __init__(self):
+        self.OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+        self.OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        self.DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "qwen/qwen3-4b:free")
 
-    OPENROUTER_BASE_URL: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    BACKEND_URL: str = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
-    DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "qwen/qwen3-4b:free")
-    TEMPERATURE: float = float(os.getenv("TEMPERATURE", 0.3))
-    MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", 1500))
-    TIMEOUT: int = int(os.getenv("TIMEOUT", 60))
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-        
 settings = Settings()
-
-with open("scientific_review/config/models.yaml", "r", encoding="utf-8") as f:
-    MODELS = yaml.safe_load(f) or {}

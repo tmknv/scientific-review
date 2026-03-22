@@ -5,11 +5,10 @@ from scientific_review.config.settings import settings
 
 
 class LLMClient:
-    def __init__(self, model=None, temperature=None, max_tokens=None, timeout=None):
+    def __init__(self, model=None, temperature=0.3, max_tokens=1200):
         self.model = model or settings.DEFAULT_MODEL
-        self.temperature = temperature if temperature is not None else settings.TEMPERATURE
-        self.max_tokens = max_tokens if max_tokens is not None else settings.MAX_TOKENS
-        self.timeout = timeout if timeout is not None else settings.TIMEOUT
+        self.temperature = temperature
+        self.max_tokens = max_tokens
 
         self.session = requests.Session()
         self.session.headers.update(
@@ -32,7 +31,7 @@ class LLMClient:
         response = self.session.post(
             f"{settings.OPENROUTER_BASE_URL}/chat/completions",
             json=payload,
-            timeout=self.timeout,
+            timeout=settings.TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()
