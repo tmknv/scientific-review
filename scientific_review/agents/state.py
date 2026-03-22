@@ -1,16 +1,26 @@
-from pydantic import BaseModel, Field
-from typing import Any, Dict, List
+from typing import Any, TypedDict
 
-class ReviewState(BaseModel):
+
+class ReviewState(TypedDict, total=False):
+    paper_id: str
     text: str
+    mode: str
 
-    scores: Dict[str, float] = Field(default_factory=dict)
-    explanations: Dict[str, str] = Field(default_factory=dict)
-    comments: Dict[str, List[str]] = Field(default_factory=dict)
+    scores: dict[str, float]
+    explanations: dict[str, str]
+    comments: dict[str, list[str]]
 
-    review_draft: str | None = None
-    review_critic: Dict[str, Any] | None = None
-    review_refined: str | None = None
-    review_final: str | None = None
+    review_draft: str
+    review_critic: dict[str, Any]
+    review_refined: str
+    review_final: str
+    review_consistency: dict[str, Any]
 
-    agent_outputs: List[Dict[str, Any]] = Field(default_factory=list)
+    strengths: list[str]
+    weaknesses: list[str]
+    suggestions: list[str]
+    bias_risks: list[str]
+
+    agents_outputs: list[dict[str, Any]]
+    final_result: dict[str, Any]
+    raw_output: str | None

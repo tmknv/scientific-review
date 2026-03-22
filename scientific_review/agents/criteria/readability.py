@@ -1,30 +1,27 @@
-from scientific_review.llm.client import LLMClient 
-from scientific_review.utils.parser import extract_json
-from scientific_review.agents.state import ReviewState 
+from pathlib import Path
+
+from scientific_review.agents.state import ReviewState
 from scientific_review.config.settings import MODELS
+from scientific_review.llm.client import LLMClient
+from scientific_review.utils.parser import extract_json
 
 
 class ReadabilityAgent:
     def __init__(self) -> None:
-        self.client = LLMClient()
-        with open("scientific_review/prompts/agents/readability.txt") as f:
-            self.prompt_template = f.read()
+        self.client = LLMClient(model=MODELS["criteria"]["readability"])
+        self.prompt = Path("scientific_review/prompts/agents/readability.txt").read_text(encoding="utf-8")
 
-    async def run(self, state: ReviewState) -> ReviewState:
-        prompt = self.prompt_template.replace("{{TEXT}}", state.text)
-        response = await self.client.generate(prompt)
-        
-        parsed = extract_json(response["text"]) or {}
+    def run(self, state: ReviewState) -> ReviewState:
+        response = self.client.generate(self.prompt.replace("{{TEXT}}", state["text"]))
+        data = extract_json(response["text"])
 
-        state.scores["readability"] = parsed.get("score", 0)
-        state.explanations["readability"] = parsed.get("explanation", "")
-        state.comments["readability"] = parsed.get("issues", [])
-
-        state.agent_outputs.append({
-            "agent": "readability",
-            "raw": response["text"],
-            "parsed": parsed,
-            "latency": response.get("latency", 0),
-        })
-
+        state.setdefault("scores", {})["readability"] = int(data["score"])
+        state.setdefault("explanations", {})["readability"] = data.get("explanation", "")
+        state.setdefault("comments", {})["readability"] = data.get("issues", [])
+        state.setdefault("agents_outputs", []).append(
+            {"agent": "readability", "raw": response["text"], "parsed": data, "usage": response["usage"]}
+        )
         return state
+
+    def close(self):
+        self.client.close()

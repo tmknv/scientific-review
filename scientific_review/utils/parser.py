@@ -1,32 +1,37 @@
 import json
 import re
+from typing import Any
 
-def extract_json(text: str):
-    text = re.sub(r"```json\s?|```", "", text).strip()
-    
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
 
-    match = re.search(r"(\{.*\}|\[.*\])", text, re.DOTALL)
-    if match:
-        candidate = match.group(0)
-    else:
-        candidate = text
+def extract_json(text: str) -> Any:
+    if not text or not text.strip():
+        raise ValueError("Empty text: cannot extract JSON")
 
-    candidate_cleaned = re.sub(r",\s*([\]}])", r"\1", candidate)
-    try:
-        return json.loads(candidate_cleaned)
-    except json.JSONDecodeError:
-        pass
+    cleaned = text.strip()
 
-    fixed = re.sub(r"([{,])\s*'([^']+)':", r'\1 "\2":', candidate_cleaned)
-    try:
-        return json.loads(fixed)
-    except json.JSONDecodeError:
-        final_attempt = candidate_cleaned.replace("'", '"')
-        try:
-            return json.loads(final_attempt)
-        except:
-            raise ValueError(f"Failed to parse JSON. Raw: {text[:100]}...")
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    candidates: list[str] = [cleaned]
+
+    obj_match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+    if obj_match:
+        candidates.insert(0, obj_match.group(0))
+
+    arr_match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+    if arr_match:
+        candidates.insert(0, arr_match.group(0))
+
+    for candidate in candidates:
+        candidate_cleaned = re.sub(r",\s*([\]}])", r"\1", candidate)
+        variants = [
+            candidate_cleaned,
+            candidate_cleaned.replace("'", '"'),
+        ]
+        for variant in variants:
+            try:
+                return json.loads(variant)
+            except json.JSONDecodeError:
+                continue
+
+    raise ValueError(f"Failed to parse JSON. Raw text starts with: {text[:200]!r}")

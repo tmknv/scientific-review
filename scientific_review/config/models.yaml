@@ -1,14 +1,14 @@
 criteria:
-  novelty: "qwen/qwen3.5-2b-instruct"          # очень быстрый для novelty
-  scientificity: "microsoft/phi-4-mini-instruct"  # сильный в методологии
-  readability: "google/gemma-3n-2b-it"         # отличный в clarity
-  complexity: "qwen/qwen3.5-2b-instruct"
+  novelty: "qwen/qwen3-4b"
+  scientificity: "qwen/qwen3-4b"
+  readability: "qwen/qwen3-4b"
+  complexity: "qwen/qwen3-4b"
 
 review:
-  draft: "qwen/qwen3.5-4b-instruct"            # чуть мощнее для черновика
-  critic: "qwen/qwen3.5-2b-instruct"           # критический анализ
-  editor: "google/gemma-3n-2b-it"              # polishing
-  final: "qwen/qwen3.5-4b-instruct"            # финальный синтез
-  consistency: "microsoft/phi-4-mini-instruct" # проверка consistency
+  draft: "qwen/qwen3-4b"
+  critic: "qwen/qwen3-4b"
+  editor: "qwen/qwen3-4b"
+  final: "qwen/qwen3-4b"
+  consistency: "qwen/qwen3-4b"
 
-baseline: "qwen/qwen3-4b"                      # как в ТЗ
+baseline: "qwen/qwen3-4b"
