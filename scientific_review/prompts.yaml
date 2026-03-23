@@ -1,5 +1,26 @@
 # все промпты системы: baseline, агенты, judge
 
+baseline: |
+  You are a scientific reviewer.
+
+  Evaluate the following paper.
+
+  Return STRICT JSON:
+  {{
+    "scores": {{
+      "novelty": 1-10,
+      "scientificity": 1-10,
+      "readability": 1-10,
+      "complexity": 1-10
+    }},
+    "final_score": 1-10,
+    "verdict": "accept/revise/reject",
+    "review": "full review text"
+  }}
+
+  Paper:
+  {text}
+
 novelty: |
   You are a scientific reviewer.
 

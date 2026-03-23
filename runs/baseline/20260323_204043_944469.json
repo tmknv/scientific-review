@@ -1,0 +1,12 @@
+{
+  "scores": {
+    "novelty": 3,
+    "scientificity": 2,
+    "readability": 8,
+    "complexity": 2,
+    "final_score": 3
+  },
+  "verdict": "reject",
+  "review": "The paper consists of a single sentence claiming a novel machine learning approach for NLP tasks without providing any methodological details, experimental evaluation, or justification. Consequently, the contribution is not substantiated, making it impossible to assess its validity or impact. The brevity results in poor scientific rigor and insufficient evidence to support the claimed novelty. While the abstract is easily readable, the lack of substance severely limits its academic value. I recommend rejecting the submission in its current form; substantial expansion with a clear problem statement, methodology, results, and discussion is required before reconsideration.",
+  "raw_output": "{\n  \"scores\": {\n    \"novelty\": 3,\n    \"scientificity\": 2,\n    \"readability\": 8,\n    \"complexity\": 2\n  },\n  \"final_score\": 3,\n  \"verdict\": \"reject\",\n  \"review\": \"The paper consists of a single sentence claiming a novel machine learning approach for NLP tasks without providing any methodological details, experimental evaluation, or justification. Consequently, the contribution is not substantiated, making it impossible to assess its validity or impact. The brevity results in poor scientific rigor and insufficient evidence to support the claimed novelty. While the abstract is easily readable, the lack of substance severely limits its academic value. I recommend rejecting the submission in its current form; substantial expansion with a clear problem statement, methodology, results, and discussion is required before reconsideration.\"\n}"
+}

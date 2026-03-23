@@ -2,6 +2,8 @@
 
 import json
 import re
+import os
+from datetime import datetime
 
 
 def extract_json(text):
@@ -22,3 +24,18 @@ def extract_json(text):
             pass
 
     return {}
+
+
+def save_json(data, folder):
+    """
+    сохраняем json
+    """
+    os.makedirs(folder, exist_ok=True)
+
+    name = datetime.now().strftime("%Y%m%d_%H%M%S_%f") + ".json"
+    path = os.path.join(folder, name)
+
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    return path

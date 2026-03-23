@@ -1,7 +1,8 @@
 # быстрый запуск multi-agent pipeline
 
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
-from pprint import pprint
+from scientific_review.utils import save_json
+
 
 if __name__ == "__main__":
     # текст статьи
@@ -10,6 +11,17 @@ if __name__ == "__main__":
     """
 
     pipeline = MultiAgentPipeline()
-    result = pipeline.run(text)
+    state = pipeline.run(text)
+
+    result = {
+        "scores": state.scores,
+        "review": state.final_review,
+        "verdict": state.verdict,
+        "agents_outputs": state.agents_outputs
+    }
 
     print(result)
+
+    path = save_json(result, "runs/multiagent")
+
+    print("Saved to:", path)

@@ -1,0 +1,36 @@
+{
+  "scores": {
+    "novelty": 3,
+    "scientificity": 2,
+    "readability": 9,
+    "complexity": 1
+  },
+  "review": "заглушка final_review",
+  "verdict": "заглушка verdict",
+  "agents_outputs": [
+    {
+      "agent": "novelty",
+      "raw_output": "{\n  \"score\": 3,\n\"reason\": \"The abstract only vaguely claims a novel ML approach for NLP without detailing the method, model, or how it differs from existing work, offering little concrete novelty.\"\n}",
+      "score": 3,
+      "reason": "The abstract only vaguely claims a novel ML approach for NLP without detailing the method, model, or how it differs from existing work, offering little concrete novelty."
+    },
+    {
+      "agent": "scientificity",
+      "raw_output": "{\n  \"score\": 2,\n  \"reason\": \"The abstract offers no substantive details about methodology, experiments, or results, making it impossible to evaluate the scientific validity or novelty of the proposed approach.\"\n}",
+      "score": 2,
+      "reason": "The abstract offers no substantive details about methodology, experiments, or results, making it impossible to evaluate the scientific validity or novelty of the proposed approach."
+    },
+    {
+      "agent": "readability",
+      "raw_output": "{\n \"score\": 9,\n  \"reason\": \"Extremely concise and uses simple, familiar language with minimal technical jargon, making it easily understandable.\"\n}",
+      "score": 9,
+      "reason": "Extremely concise and uses simple, familiar language with minimal technical jargon, making it easily understandable."
+    },
+    {
+      "agent": "complexity",
+      "raw_output": "{\n  \"score\": 1,\n  \"reason\": \"Abstract lacks technical specifics, methodology details, or innovation description; only states a generic 'novel approach' without elaboration.\"\n}",
+      "score": 1,
+      "reason": "Abstract lacks technical specifics, methodology details, or innovation description; only states a generic 'novel approach' without elaboration."
+    }
+  ]
+}
