@@ -1,20 +1,21 @@
 # основной multi-agent pipeline: запуск агентов и сбор финального результата
 
 from scientific_review.agents.state import State
-from scientific_review.agents.criteria_agents import NoveltyAgent
+from scientific_review.agents.criteria_agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
 
 
 class MultiAgentPipeline:
     def __init__(self):
-        self.novelty_agent = NoveltyAgent()
+        self.agents = [NoveltyAgent(), ScientificityAgent(), ReadabilityAgent(), ComplexityAgent()]
 
     def run(self, text):
         state = State(text=text)
 
         # критерии
-        state = self.novelty_agent.run(state)
+        for agent in self.agents:
+            state = agent.run(state)
 
-        # финал (заглушка)
+        # ревью (заглушка)
         state.final_review = "заглушка final_review"
         state.verdict = "заглушка verdict"
 

@@ -1,1 +1,57 @@
 # все промпты системы: baseline, агенты, judge
+
+novelty: |
+  You are a scientific reviewer.
+
+  Evaluate the NOVELTY of the following paper.
+
+  Return STRICT JSON:
+  {{
+    "score": 1-10,
+    "reason": "short explanation"
+  }}
+
+  Paper:
+  {text}
+
+scientificity: |
+  You are a scientific reviewer.
+
+  Evaluate the SCIENTIFIC VALIDITY of the following paper.
+
+  Return STRICT JSON:
+  {{
+    "score": 1-10,
+    "reason": "short explanation"
+  }}
+
+  Paper:
+  {text}
+
+readability: |
+  You are a scientific reviewer.
+
+  Evaluate the READABILITY of the following paper.
+
+  Return STRICT JSON:
+  {{
+    "score": 1-10,
+    "reason": "short explanation"
+  }}
+
+  Paper:
+  {text}
+
+complexity: |
+  You are a scientific reviewer.
+
+  Evaluate the TECHNICAL COMPLEXITY of the following paper.
+
+  Return STRICT JSON:
+  {{
+    "score": 1-10,
+    "reason": "short explanation"
+  }}
+
+  Paper:
+  {text}

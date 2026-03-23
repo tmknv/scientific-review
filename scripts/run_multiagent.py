@@ -1,7 +1,7 @@
 # быстрый запуск multi-agent pipeline
 
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
-
+from pprint import pprint
 
 if __name__ == "__main__":
     # текст статьи
