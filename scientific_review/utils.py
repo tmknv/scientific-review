@@ -39,3 +39,24 @@ def save_json(data, folder):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     return path
+
+
+def final_score(state) -> float:
+    scores = state.scores
+
+    if not scores:
+        return -1
+
+    final_score = sum(scores.values()) / len(scores)
+    return round(final_score, 2)
+
+def print_json(obj):
+    """
+    Красиво печатает объект, который можно преобразовать в словарь.
+    """
+    if hasattr(obj, "__dict__"):
+        data = obj.__dict__
+    else:
+        data = obj
+    formatted_json = json.dumps(data, indent=4, ensure_ascii=False)
+    print(formatted_json)

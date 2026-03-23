@@ -3,6 +3,7 @@
 from scientific_review.agents.state import State
 from scientific_review.agents.criteria_agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
 from scientific_review.agents.review_agents import RawReviewAgent, FinalReviewAgent
+from scientific_review.utils import final_score
 
 
 class MultiAgentPipeline:
@@ -24,5 +25,7 @@ class MultiAgentPipeline:
         # рецензия
         state = RawReviewAgent().run(state)
         state = FinalReviewAgent().run(state)
+        state.scores["final_score"] = final_score(state)
+
 
         return state

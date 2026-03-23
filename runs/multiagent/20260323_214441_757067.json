@@ -1,0 +1,37 @@
+{
+  "scores": {
+    "novelty": 2,
+    "scientificity": 3,
+    "readability": 9,
+    "complexity": 3,
+    "final_score": 4.25
+  },
+  "review": "В работе приводятся лишь общие формулировки о «новой подходе в машинном обучении для задач NLP», однако в статье отсутствуют детали метода, описание экспериментальной установки, результаты и сопоставительный анализ. Эти недостающие элементы делают оценку технического достоинства статьи невозможной, а её научную значимость – неоправданно высокой. Несмотря на высокую читаемость и лаконичную формулировку в абстракте, отсутствие конкретики приводит к противоречию между простотой изложения и низкой научной глубиной. В целом, материал демонстрирует потенциал, но требует существенного уточнения и расширения.\n\nКлючевые сильные стороны – ясность и доступность формулировок; ключевые слабые стороны – отсутствие Novelty, отсутствие технических деталей, экспериментальных результатов и сравнительного анализа, что в целом подрывает научную обоснованность. Конфликт заключается в том, что работа легко воспринимается благодаря читаемому стилю, однако Simultaneously остаётся ветхой в научном содержании.\n\nВердикт: major revision",
+  "verdict": "major revision",
+  "agents_outputs": [
+    {
+      "agent": "novelty",
+      "raw_output": "{\n  \"score\": 2,\n  \"reason\": \"The claim is extremely generic and lacks any concrete methodological details, making novelty unfounded.\"\n}",
+      "score": 2,
+      "reason": "The claim is extremely generic and lacks any concrete methodological details, making novelty unfounded."
+    },
+    {
+      "agent": "scientificity",
+      "raw_output": "{\n  \"score\": 3,\n  \"reason\": \"The abstract provides only a generic claim of novelty without any methodological details, experimental results, or broader context, making it impossible to evaluate the technical merits or validity of the proposed approach.\"\n}",
+      "score": 3,
+      "reason": "The abstract provides only a generic claim of novelty without any methodological details, experimental results, or broader context, making it impossible to evaluate the technical merits or validity of the proposed approach."
+    },
+    {
+      "agent": "readability",
+      "raw_output": "{\n  \"score\": 9,\n  \"reason\": \"The paper is a single, simple sentence with clear, straightforward language, making it highly readable.\"\n}",
+      "score": 9,
+      "reason": "The paper is a single, simple sentence with clear, straightforward language, making it highly readable."
+    },
+    {
+      "agent": "complexity",
+      "raw_output": "{\n \"score\": 3,\n  \"reason\": \"The description is very high-level and lacks technical detail, indicating low implementation or methodological complexity.\"\n}",
+      "score": 3,
+      "reason": "The description is very high-level and lacks technical detail, indicating low implementation or methodological complexity."
+    }
+  ]
+}

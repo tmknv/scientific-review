@@ -1,0 +1,37 @@
+{
+  "scores": {
+    "novelty": 3,
+    "scientificity": 1,
+    "readability": 9,
+    "complexity": 2,
+    "final_score": 3.75
+  },
+  "review": "В работе представлено, что автор лишь заявивает о «новом подходе в области NLP», однако в аннотации отсутствуют конкретные описания методологии, архитектуры модели, данных и результатов экспериментов. Вводный абзац прост, понятен и хорошо написан, но эта ясность сопровождается отсутствием научной глубины: нет убедительных доказательств того, что предложенный метод представляет значимое улучшение. Таким образом, наблюдается противоречие между высокой читабельностью текста и слабым научным содержанием, из-за чего авторскую претензию к новизне нельзя признать обоснованной.",
+  "verdict": "major revision",
+  "agents_outputs": [
+    {
+      "agent": "novelty",
+      "raw_output": "{\n  \"score\": 3,\n  \"reason\": \"The claim of novelty is vague and lacks concrete methodological details, making it difficult to assess a truly novel contribution.\"\n}",
+      "score": 3,
+      "reason": "The claim of novelty is vague and lacks concrete methodological details, making it difficult to assess a truly novel contribution."
+    },
+    {
+      "agent": "scientificity",
+      "raw_output": "{\n  \"score\": 1,\n  \"reason\": \"The abstract provides no methodological details, experiments, or results, making it impossible to assess any scientific validity.\"\n}",
+      "score": 1,
+      "reason": "The abstract provides no methodological details, experiments, or results, making it impossible to assess any scientific validity."
+    },
+    {
+      "agent": "readability",
+      "raw_output": "{\n  \"score\": 9,\n  \"reason\": \"The sentence is concise, uses common vocabulary, and follows straightforward grammar, making it highly readable.\"\n}",
+      "score": 9,
+      "reason": "The sentence is concise, uses common vocabulary, and follows straightforward grammar, making it highly readable."
+    },
+    {
+      "agent": "complexity",
+      "raw_output": "{\n  \"score\": 2,\n  \"reason\": \"The abstract provides only a vague statement about proposing a novel ML approach without describing methodology, datasets, or evaluation, indicating minimal technical depth.\"\n}",
+      "score": 2,
+      "reason": "The abstract provides only a vague statement about proposing a novel ML approach without describing methodology, datasets, or evaluation, indicating minimal technical depth."
+    }
+  ]
+}
