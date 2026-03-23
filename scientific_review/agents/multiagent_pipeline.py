@@ -14,14 +14,14 @@ class MultiAgentPipeline:
             ComplexityAgent(),
         ]
 
-    def run(self, text: str) -> State:
+    def run(self, text):
         state = State(text=text)
 
-        # этап 1 — агенты
+        # оценки
         for agent in self.agents:
             state = agent.run(state)
 
-        # этап 2 — генерация рецензии
+        # рецензия
         state = RawReviewAgent().run(state)
         state = FinalReviewAgent().run(state)
 

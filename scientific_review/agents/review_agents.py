@@ -1,7 +1,9 @@
 # агенты для генерации и улучшения рецензии (draft, critic, editor, final)
+
 from scientific_review.client import Client
 from scientific_review.utils import extract_json
 from scientific_review.config import PROMPTS
+
 
 class BaseReviewAgent:
     def __init__(self, name):
