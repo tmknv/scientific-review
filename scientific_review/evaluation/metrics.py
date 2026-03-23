@@ -1,1 +1,1 @@
-# метрики
+# метрики: spearman correlation, variance и другие

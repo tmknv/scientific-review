@@ -1,0 +1,1 @@
+# baseline pipeline: один вызов llm (qwen3-4b) для генерации оценки и ревью
