@@ -1,1 +1,1 @@
-# запуск baseline pipeline на данных
+# быстрый запуск baseline pipeline
