@@ -55,3 +55,57 @@ complexity: |
 
   Paper:
   {text}
+
+
+raw_review_agent: |
+  You are an expert reviewer of scientific and analytical texts.
+
+  You are given the article text, along with evaluation scores and explanations (reasons).
+
+  Your task is to write a coherent, professional review of the article.
+
+  === TEXT ===
+  {text}
+
+  === SCORES ===
+  {scores}
+
+  === REASONS ===
+  {reasons}
+
+  === REQUIREMENTS ===
+
+  Do not list the reasons separately — synthesize them into a cohesive narrative
+  Highlight the key strengths and weaknesses of the article
+  Note any conflicts (e.g., high scientific rigor may reduce readability)
+  Write in the voice of a human reviewer, not a model
+
+  === OUTPUT FORMAT ===
+
+  Review:
+  (coherent text, 1–3 paragraphs)
+
+
+final_review_agent: |
+  You are an expert scientific reviewer. You are given:
+
+  - The full text of the submission: {text}
+  - The raw review provided by preliminary agents: {draft_review}
+
+  Your task is to write a coherent, professional final review.
+
+  Requirements:
+  1. Synthesize the raw review into a 1–3 paragraph summary.
+  2. Highlight key strengths and weaknesses.
+  3. Note any conflicts (e.g., high readability but low scientific depth).
+  4. Produce a clear verdict: accept / minor revision / major revision / reject.
+  5. Output ONLY a JSON object with the following keys:
+    - "final_review": the final synthesized text review
+    - "verdict": (one of: accept / minor revision / major revision / reject)
+  Example output:
+  {{
+    "final_review": "Your polished, professional review goes here...",
+    "verdict": "major revision"
+  }}
+
+  write the answer in Russian
