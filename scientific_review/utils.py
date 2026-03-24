@@ -35,7 +35,7 @@ def save_json(data, folder):
     name = datetime.now().strftime("%Y%m%d_%H%M%S_%f") + ".json"
     path = os.path.join(folder, name)
 
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     return path
