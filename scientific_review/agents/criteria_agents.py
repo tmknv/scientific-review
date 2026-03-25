@@ -4,6 +4,28 @@ from scientific_review.client import Client
 from scientific_review.utils import extract_json
 from scientific_review.config import PROMPTS
 
+# для получения имен добавить отдельный метод с @property в BaseCriteriaAgent
+# используйте return self.__name__ или чета такое 
+
+# Нужно ли self.client = Client() в конструктор совать ? 
+
+# Если используете ООП, делайте нормально. Почему BaseCriteriaAgent
+# Не наследуется от ABC ? Почему нет абстратных методов ? 
+# Сделайте два метода, run и analyze, run - абстрактный, analyze будет запускать 
+#  run и считать время работы. Также в analyze сделать обработку ошибок(try/except) чтобы 
+# было понятно где агент и какой упал, а главное почему. 
+
+# Где структура вывода ? Обязательно сделать типизацию. 
+# Свой тип сделать с помощью @dataclass (им будут агенты обмениваться)
+
+#PROMPTS нужно хранить в .yaml файлике
+
+# Уверены что агенты должны юыть синхронные ? Реально ждать каждого будете ? 
+
+#state какого типа ? Вам нужно создать структуру данных для state, чтобы state: State.
+# State - short memory для мультиагентов. 
+
+#ТИПИЗАЦИЯ !!!!! ДОКСТРИНГИ!!!!! ШАПКА!!!!!
 
 class BaseCriteriaAgent:
     def __init__(self, name):
