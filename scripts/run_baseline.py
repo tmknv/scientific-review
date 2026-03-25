@@ -1,7 +1,7 @@
 # быстрый запуск baseline pipeline
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
-from scientific_review.utils import save_json
+from scientific_review.utils import print_json, save_json
 
 
 if __name__ == "__main__":
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     pipeline = BaselinePipeline()
     result = pipeline.run(text)
 
-    print(result)
+    print_json(result)
 
     path = save_json(result, "runs/baseline")
 

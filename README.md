@@ -62,6 +62,7 @@ poetry run python scripts/run_multiagent.py
   },
   "review": "Детальный текст рецензии...",
   "verdict": "accept"
+  "raw_output": " ... "
 }
 Saved to: runs/baseline/20260325_120543_123456.json
 ```
@@ -69,6 +70,7 @@ Saved to: runs/baseline/20260325_120543_123456.json
 ### Для Multi-Agent Pipeline:
 ```
 {
+  "text": " ... "
   "scores": {
     "novelty": 9,
     "scientificity": 6,
@@ -76,10 +78,12 @@ Saved to: runs/baseline/20260325_120543_123456.json
     "complexity": 5
     "final_score": 7
   },
-  "review": "Детальный текст рецензии от агентов...",
+  "draft_review": " ... "
+  "final_review": "Детальный текст рецензии от агентов...",
   "verdict": "accept",
   "agents_outputs": [...]
   }
+  "metadata": {...}
 }
 Saved to: runs/multiagent/20260325_120543_654321.json
 ```
