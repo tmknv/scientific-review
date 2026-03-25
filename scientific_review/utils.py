@@ -52,7 +52,7 @@ def final_score(state) -> float:
 
 def print_json(obj):
     """
-    Красиво печатает объект, который можно преобразовать в словарь.
+    красиво печатает json
     """
     if hasattr(obj, "__dict__"):
         data = obj.__dict__

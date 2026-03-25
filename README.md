@@ -5,23 +5,23 @@
 ## Реализованный код
 
 ### Основные модули (`scientific_review/`)
-- **config.py** - Загрузка переменных окружения и конфигурации из `prompts.yaml`
-- **client.py** - Унифицированный клиент для работы с OpenRouter API 
-- **utils.py** - Утилиты: работа с JSON, сохранение файлов, расчёт оценок
+- **config.py** - загрузка переменных окружения и конфигурации из `prompts.yaml`
+- **client.py** - унифицированный клиент для работы с OpenRouter API 
+- **utils.py** - утилиты: работа с JSON, сохранение файлов, расчёт оценок
 
 ### Мультиагентная система (`scientific_review/agents/`)
-- **criteria_agents.py** - Четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
-- **review_agents.py** - Агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
-- **multiagent_pipeline.py** - Оркестрация работы всех агентов в последовательный pipeline
-- **state.py** - Общее состояние для обмена данными между агентами (текст, оценки, рецензии)
-- **tools.py** - Расширяемый модуль для инструментов агентов
+- **criteria_agents.py** - четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
+- **review_agents.py** - агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
+- **multiagent_pipeline.py** - оркестрация работы всех агентов в последовательный pipeline
+- **state.py** - общее состояние для обмена данными между агентами (текст, оценки, рецензии)
+- **tools.py** - расширяемый модуль для инструментов агентов (например, поиск для NoveltyAgent)
 
 ### Базовый подход (`scientific_review/baseline/`)
-- **baseline_pipeline.py** - Простой baseline: однозвездный вызов LLM для оценки и рецензии
+- **baseline_pipeline.py** - простой baseline: один вызов монолитной LLM для оценки и рецензии
 
 ### Скрипты запуска (`scripts/`)
-- **run_baseline.py** - Запуск baseline pipeline с примером использования
-- **run_multiagent.py** - Запуск мультиагентного pipeline с примером использования
+- **run_baseline.py** - запуск baseline pipeline с примером использования
+- **run_multiagent.py** - запуск multiagent pipeline с примером использования
 ### 3. Запустить pipeline
 
 #### Запуск baseline подхода:
@@ -37,8 +37,8 @@ poetry run python scripts/run_multiagent.py
 ## Результаты
 
 Результаты экспериментов сохраняются в JSON формате:
-- Результаты baseline сохраняются в `runs/baseline/`
-- Результаты multi-agent сохраняются в `runs/multiagent/`
+- результаты baseline сохраняются в `runs/baseline/`
+- результаты multi-agent сохраняются в `runs/multiagent/`
 
 Каждый результат содержит:
 - **scores** - числовые оценки по различным критериям
@@ -54,9 +54,11 @@ poetry run python scripts/run_multiagent.py
 ```
 {
   "scores": {
-    "relevance": 0.85,
-    "novelty": 0.78,
-    ...
+    "novelty": 9,
+    "scientificity": 6,
+    "readability": 8,
+    "complexity": 5
+    "final_score": 7
   },
   "review": "Детальный текст рецензии...",
   "verdict": "accept"
@@ -68,16 +70,15 @@ Saved to: runs/baseline/20260325_120543_123456.json
 ```
 {
   "scores": {
-    "relevance": 0.85,
-    "novelty": 0.78,
-    ...
+    "novelty": 9,
+    "scientificity": 6,
+    "readability": 8,
+    "complexity": 5
+    "final_score": 7
   },
   "review": "Детальный текст рецензии от агентов...",
   "verdict": "accept",
-  "agents_outputs": {
-    "relevance_agent": {...},
-    "methodology_agent": {...},
-    ...
+  "agents_outputs": [...]
   }
 }
 Saved to: runs/multiagent/20260325_120543_654321.json
@@ -86,20 +87,20 @@ Saved to: runs/multiagent/20260325_120543_654321.json
 ## Реализованный код
 
 ### Основные модули (`scientific_review/`)
-- **config.py** - Загрузка переменных окружения и конфигурации из `prompts.yaml`
-- **client.py** - Унифицированный клиент для работы с OpenRouter API 
-- **utils.py** - Утилиты: работа с JSON, сохранение файлов, расчёт оценок
+- **config.py** - загрузка переменных окружения и конфигурации из `prompts.yaml`
+- **client.py** - унифицированный клиент для работы с OpenRouter API 
+- **utils.py** - утилиты: работа с JSON, сохранение файлов, расчёт оценок
 
 ### Мультиагентная система (`scientific_review/agents/`)
-- **criteria_agents.py** - Четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
-- **review_agents.py** - Агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
-- **multiagent_pipeline.py** - Оркестрация работы всех агентов в последовательный pipeline
-- **state.py** - Общее состояние для обмена данными между агентами (текст, оценки, рецензии)
-- **tools.py** - Расширяемый модуль для инструментов агентов
+- **criteria_agents.py** - четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
+- **review_agents.py** - агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
+- **multiagent_pipeline.py** - оркестрация работы всех агентов в последовательный pipeline
+- **state.py** - общее состояние для обмена данными между агентами (текст, оценки, рецензии)
+- **tools.py** - расширяемый модуль для инструментов агентов
 
 ### Базовый подход (`scientific_review/baseline/`)
-- **baseline_pipeline.py** - Простой baseline: однозвездный вызов LLM для оценки и рецензии
+- **baseline_pipeline.py** - простой baseline: однозвездный вызов LLM для оценки и рецензии
 
 ### Скрипты запуска (`scripts/`)
-- **run_baseline.py** - Запуск baseline pipeline с примером использования
-- **run_multiagent.py** - Запуск мультиагентного pipeline с примером использования
+- **run_baseline.py** - запуск baseline pipeline с примером использования
+- **run_multiagent.py** - запуск мультиагентного pipeline с примером использования
