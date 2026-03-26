@@ -41,13 +41,13 @@ class BaseAgent(ABC):
         client: Клиент для взаимодействия с LLM.
     """
     def __init__(self, name, client):
-        self._name = name
+        self._name_ = name
         self.client = client
 
     @property
     def name(self) -> str:
         """Возвращает имя агента."""
-        return self._name
+        return self._name_
 
     @abstractmethod
     async def run(self, state: State) -> State:
@@ -207,14 +207,14 @@ class RawReviewAgent(BaseAgent):
     def __init__(self, client):
         super().__init__(name = 'raw_review_agent', client=client)
 
-    async def run(self, state):
+    async def run(self, state: State) -> State:
 
         scores = {output['agent']: output['score'] for output in state.agents_outputs}
     
         reasons = {output['agent']: output['reason'] for output in state.agents_outputs}
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
-        response = self.client.generate(prompt)
+        response = await self.client.generate(prompt)
         data = extract_json(response)
 
         review = data.get("Review", response)
@@ -237,10 +237,10 @@ class FinalReviewAgent(BaseAgent):
     def __init__(self, client):
         super().__init__(name = 'final_review_agent', client=client)
 
-    async def run(self, state):
+    async def run(self, state: State) -> State:
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{draft_review}", state.draft_review)
-        response = self.client.generate(prompt)
+        response = await self.client.generate(prompt)
         data = extract_json(response)
 
         final_review = data.get("final_review", response)
