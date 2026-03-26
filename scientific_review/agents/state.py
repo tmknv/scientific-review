@@ -1,72 +1,95 @@
 # scientific_review/agents/state.py
-# общий state (short-term memory), через который взаимодействуют все агенты
+# общий short-term memory state мультиагентной системы
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Any
+from typing import Annotated, Dict, List, Any, TypedDict
+import operator
+
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
 
 
-@dataclass
-class State:
+def merge_dicts(old: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, Any]:
     """
-    общая память мультиагентной системы
+    Объединяет два словаря.
 
-    агенты читают и записывают данные в этот объект,
-    используя как свою ячейку, так и общие поля
+    Args:
+        old: Старое состояние.
+        new: Новые данные.
+
+    Returns:
+        Dict[str, Any]: Объединённый словарь.
+    """
+    return {**old, **new}
+
+
+class AgentState(TypedDict):
+    """
+    Short-term memory мультиагентной системы рецензирования.
+
+    State используется как единая разделяемая память между агентами.
+    Каждый агент читает и модифицирует state, тем самым формируя
+    накопленное представление о статье и процессе её анализа.
 
     Attributes:
-        text: текст статьи
+        text: Текст научной статьи.
 
-        novelty_agent: память агента новизны
-        scientificity_agent: память агента научности
-        readability_agent: память агента читаемости
-        complexity_agent: память агента сложности
+        messages: История сообщений (контекст LLM).
+            Используется для передачи промежуточных рассуждений между агентами.
 
-        review_agent: память агента чернового ревью
-        final_agent: память финального агента
+        scores: Словарь оценок по критериям.
+            Пример: {"novelty": 7.0, "readability": 5.0}
 
-        agents_group: общая память между агентами
+        reasons: Объяснения оценок по каждому критерию.
+            Пример: {"novelty": "...", "readability": "..."}
 
-        scores: итоговые оценки по критериям
-        reasons: объяснения оценок
+        novelty_agent: Внутреннее состояние агента новизны.
+        scientificity_agent: Внутреннее состояние агента научности.
+        readability_agent: Внутреннее состояние агента читаемости.
+        complexity_agent: Внутреннее состояние агента сложности.
 
-        draft_review: черновик ревью
-        final_review: финальный текст ревью
+        review_agent: Состояние агента чернового ревью.
+        final_review_agent: Состояние финального агента.
 
-        verdict: итоговое решение
+        draft_review: Черновой текст рецензии.
+        final_review: Финальный текст рецензии.
+        verdict: Итоговое решение (accept / revise / reject).
 
-        agents_outputs: лог работы агентов
-        metadata: служебные данные (время, ошибки и тд)
+        agents_outputs: Лог всех действий агентов.
+            Используется для анализа, дебага и сохранения артефактов.
+            Пример: [{"agent": "novelty", "raw_output": "...", "parsed_score": 5, "reason": "..."}]
+
+        metadata: Служебная информация:
+            - время работы агентов
+            - ошибки
+            - дополнительная диагностика
     """
 
     # вход
-    text: str = ""
+    text: str
 
-    # память агентов (criteria)
-    novelty_agent: Dict[str, Any] = field(default_factory=dict)
-    scientificity_agent: Dict[str, Any] = field(default_factory=dict)
-    readability_agent: Dict[str, Any] = field(default_factory=dict)
-    complexity_agent: Dict[str, Any] = field(default_factory=dict)
+    # short-term memory
+    messages: Annotated[List[BaseMessage], add_messages]
 
-    # память агентов (review)
-    review_agent: Dict[str, Any] = field(default_factory=dict)
-    final_agent: Dict[str, Any] = field(default_factory=dict)
+    # структурированная память
+    scores: Annotated[Dict[str, float], merge_dicts]
+    reasons: Annotated[Dict[str, str], merge_dicts]
 
-    # общая память
-    agents_group: Dict[str, Any] = field(default_factory=dict)
+    # память отдельных агентов
+    novelty_agent: Dict[str, Any]
+    scientificity_agent: Dict[str, Any]
+    readability_agent: Dict[str, Any]
+    complexity_agent: Dict[str, Any]
+    
+    raw_review_agent: Dict[str, Any]
+    final_review_agent: Dict[str, Any]
 
-    # агрегированные данные
-    scores: Dict[str, float] = field(default_factory=dict)
-    reasons: Dict[str, str] = field(default_factory=dict)
+    # текстовые результаты
+    draft_review: str
+    final_review: str
+    verdict: str
 
-    # ревью
-    draft_review: str = ""
-    final_review: str = ""
+    # лог системы
+    agents_outputs: Annotated[List[Dict[str, Any]], operator.add]
 
-    # итоговое решение
-    verdict: str = ""
-
-    # лог
-    agents_outputs: List[Dict[str, Any]] = field(default_factory=list)
-
-    # служебка (метаданные, время и тд)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    # служебные данные
+    metadata: Annotated[Dict[str, Any], merge_dicts]
