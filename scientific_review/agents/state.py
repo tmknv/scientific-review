@@ -2,7 +2,7 @@
 # общий short-term memory state мультиагентной системы
 
 from dataclasses import dataclass, field
-from typing import Annotated, Dict, List, Any, TypedDict
+from typing import Annotated, Dict, List, Any
 import operator
 
 from langchain_core.messages import BaseMessage
@@ -23,7 +23,7 @@ def merge_dicts(old: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, Any]:
     return {**old, **new}
 
 @dataclass
-class State(TypedDict):
+class State():
     """
     Short-term memory мультиагентной системы рецензирования.
 

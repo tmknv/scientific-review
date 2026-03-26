@@ -40,7 +40,6 @@ class MultiAgentPipeline:
         """
         state = State(text=text)
 
-        # Запускаем агентов параллельно
         for agent in self.agents:
             state = await agent.run(state)
 
