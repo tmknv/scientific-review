@@ -2,7 +2,7 @@
 # общий short-term memory state мультиагентной системы
 
 from dataclasses import dataclass, field
-from typing import Annotated, Dict, List, Any, TypedDict
+from typing import Annotated, Dict, List, Any
 import operator
 
 from langchain_core.messages import BaseMessage
@@ -11,19 +11,19 @@ from langgraph.graph.message import add_messages
 
 def merge_dicts(old: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Объединяет два словаря.
+    Объединяет два словаря
 
     Args:
-        old: Старое состояние.
-        new: Новые данные.
+        old: Старое состояние
+        new: Новые данные
 
     Returns:
-        Dict[str, Any]: Объединённый словарь.
+        Dict[str, Any]: Объединенный словарь
     """
     return {**old, **new}
 
 @dataclass
-class State(TypedDict):
+class State:
     """
     Short-term memory мультиагентной системы рецензирования.
 
@@ -32,31 +32,31 @@ class State(TypedDict):
     накопленное представление о статье и процессе её анализа.
 
     Attributes:
-        text: Текст научной статьи.
+        text: Текст научной статьи
 
-        messages: История сообщений (контекст LLM).
+        messages: История сообщений (контекст LLM)
             Используется для передачи промежуточных рассуждений между агентами.
 
-        scores: Словарь оценок по критериям.
+        scores: Словарь оценок по критериям
             Пример: {"novelty": 7.0, "readability": 5.0}
 
-        reasons: Объяснения оценок по каждому критерию.
+        reasons: Объяснения оценок по каждому критерию
             Пример: {"novelty": "...", "readability": "..."}
 
-        novelty_agent: Внутреннее состояние агента новизны.
-        scientificity_agent: Внутреннее состояние агента научности.
-        readability_agent: Внутреннее состояние агента читаемости.
-        complexity_agent: Внутреннее состояние агента сложности.
+        novelty_agent: Внутреннее состояние агента новизны
+        scientificity_agent: Внутреннее состояние агента научности
+        readability_agent: Внутреннее состояние агента читаемости
+        complexity_agent: Внутреннее состояние агента сложности
 
-        review_agent: Состояние агента чернового ревью.
-        final_review_agent: Состояние финального агента.
+        review_agent: Состояние агента чернового ревью
+        final_review_agent: Состояние финального агента
 
-        draft_review: Черновой текст рецензии.
-        final_review: Финальный текст рецензии.
-        verdict: Итоговое решение (accept / revise / reject).
+        draft_review: Черновой текст рецензии
+        final_review: Финальный текст рецензии
+        verdict: Итоговое решение (accept / revise / reject)
 
-        agents_outputs: Лог всех действий агентов.
-            Используется для анализа, дебага и сохранения артефактов.
+        agents_outputs: Лог всех действий агентов
+            Используется для анализа, дебага и сохранения артефактов
             Пример: [{"agent": "novelty", "raw_output": "...", "parsed_score": 5, "reason": "..."}]
 
         metadata: Служебная информация:
