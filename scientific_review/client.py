@@ -41,7 +41,7 @@ class Client:
             await self.session.close()
             self.session = None
 
-    async def generate(self, prompt: str) -> Dict[str, Any]:
+    async def generate(self, prompt: str) -> str:
         """
         Асинхронно отправляет запрос в OpenRouter и возвращает результат.
 
@@ -49,7 +49,7 @@ class Client:
             prompt: Строка запроса
 
         Returns:
-            Dict[str, Any]: Распарсенный результат нейронки
+            str: Результат нейронки
         """
         if not self.session:
             raise RuntimeError("client session не инициализирован")
@@ -66,10 +66,7 @@ class Client:
 
                 content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-                try:
-                    return json.loads(content)
-                except (json.JSONDecodeError, TypeError):
-                    return {"text": content}
+                return content 
 
         except Exception as e:
-            return {"error": str(e)}
+            return f"Error: {str(e)}"

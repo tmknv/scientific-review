@@ -11,9 +11,9 @@ async def main():
     text = """
     This paper proposes a novel machine learning approach for NLP tasks.
     """
-    client = Client()
-    pipeline = MultiAgentPipeline(client=client)
-    state = await pipeline.run(text)
+    async with Client() as client:
+        pipeline = MultiAgentPipeline(client=client)
+        state = await pipeline.run(text)
 
     result = {
         "scores": state.scores,
