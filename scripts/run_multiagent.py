@@ -1,17 +1,19 @@
 # быстрый запуск multi-agent pipeline
 
+import asyncio
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
 from scientific_review.utils import print_json, save_json
+from scientific_review.client import Client
 
 
-if __name__ == "__main__":
+async def main():
     # текст статьи
     text = """
     This paper proposes a novel machine learning approach for NLP tasks.
     """
-
-    pipeline = MultiAgentPipeline()
-    state = pipeline.run(text)
+    client = Client()
+    pipeline = MultiAgentPipeline(client=client)
+    state = await pipeline.run(text)
 
     result = {
         "scores": state.scores,
@@ -25,3 +27,7 @@ if __name__ == "__main__":
     path = save_json(result, "runs/multiagent")
 
     print("Saved to:", path)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
