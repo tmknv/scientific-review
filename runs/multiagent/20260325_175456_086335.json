@@ -1,0 +1,37 @@
+{
+  "scores": {
+    "novelty": 3,
+    "scientificity": 2,
+    "readability": 9,
+    "complexity": 4,
+    "final_score": 4.5
+  },
+  "review": "Обзор подчёркивает исключительную ясность и лаконичность формулировки цели, что делает абстракт легко воспринимаемым даже непосвящённым в область NLP. Однако novelty остаётся лишь формальным заявлением без конкретных деталей архитектуры, сопоставления с базовыми моделями и обоснования её преимуществ. Отсутствуют описания экспериментального протокола, использования бенчмарков и представленных результатов, что ставит под сомнение научную строгость работы и приводит к конфликту между высокой читаемостью и низкой научной глубиной.\n\nВ целом, для превращения вводного описания в самостоятельный научный вклад требуется значительно расширить раздел методологии, добавить детали о экспериментальной установке, оценить производительность на стандартных датасетах и представить количественные результаты, что позволит подтвердить заявленную новизну и усилить научную обоснованность.",
+  "verdict": "major revision",
+  "agents_outputs": [
+    {
+      "agent": "novelty",
+      "raw_output": "{\n  \"score\": 3,\n  \"reason\": \"The claim is generic and lacks concrete details or comparatives, making true novelty unclear.\"\n}",
+      "score": 3,
+      "reason": "The claim is generic and lacks concrete details or comparatives, making true novelty unclear."
+    },
+    {
+      "agent": "scientificity",
+      "raw_output": "{\n \"score\": 2,\n  \"reason\": \"The abstract is overly generic, provides no technical detail, methodology, evaluation, or empirical results, making it impossible to assess any scientific contribution or validity.\"\n}",
+      "score": 2,
+      "reason": "The abstract is overly generic, provides no technical detail, methodology, evaluation, or empirical results, making it impossible to assess any scientific contribution or validity."
+    },
+    {
+      "agent": "readability",
+      "raw_output": "{\n  \"score\":9,\n  \"reason\": \"Concise, clear single sentence with simple vocabulary and straightforward structure.\"\n}",
+      "score": 9,
+      "reason": "Concise, clear single sentence with simple vocabulary and straightforward structure."
+    },
+    {
+      "agent": "complexity",
+      "raw_output": "{\n \"score\": 4,\n  \"reason\": \"The abstract only mentions a novel ML approach for NLP without detailing methodology, experiments, or technical depth, leading to a modest complexity rating.\"\n}",
+      "score": 4,
+      "reason": "The abstract only mentions a novel ML approach for NLP without detailing methodology, experiments, or technical depth, leading to a modest complexity rating."
+    }
+  ]
+}

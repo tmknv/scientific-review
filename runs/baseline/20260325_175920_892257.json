@@ -1,0 +1,12 @@
+{
+  "scores": {
+    "novelty": 2,
+    "scientificity": 3,
+    "readability": 8,
+    "complexity": 2,
+    "final_score": 3
+  },
+  "verdict": "reject",
+  "review": "The paper provides only a vague statement that a novel machine learning approach will be proposed for NLP tasks without describing the method, its novelty, technical details, or experimental validation. The lack of concrete contributions makes it impossible to assess scientific merit. Readability is high due to the simple sentence, but the content lacks depth, methodology, and empirical evidence, resulting in low novelty, scientificity, and complexity.",
+  "raw_output": "{\n  \"scores\": {\n   \"novelty\": 2,\n    \"scientificity\": 3,\n    \"readability\": 8,\n    \"complexity\": 2\n  },\n  \"final_score\": 3,\n  \"verdict\": \"reject\",\n  \"review\": \"The paper provides only a vague statement that a novel machine learning approach will be proposed for NLP tasks without describing the method, its novelty, technical details, or experimental validation. The lack of concrete contributions makes it impossible to assess scientific merit. Readability is high due to the simple sentence, but the content lacks depth, methodology, and empirical evidence, resulting in low novelty, scientificity, and complexity.\"\n}"
+}
