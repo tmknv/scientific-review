@@ -66,10 +66,7 @@ class Client:
 
                 content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-                try:
-                    return json.loads(content)
-                except (json.JSONDecodeError, TypeError):
-                    return {"text": content}
+                return content
 
         except Exception as e:
             return {"error": str(e)}
