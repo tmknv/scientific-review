@@ -7,6 +7,7 @@ import traceback
 
 from scientific_review.utils import extract_json, load_prompts
 from scientific_review.agents.state import State
+from langchain_core.messages import HumanMessage, AIMessage
 
 # для получения имен добавить отдельный метод с @property в BaseAgent
 # используйте return self.__name__ или чета такое 
@@ -99,11 +100,13 @@ class NoveltyAgent(BaseAgent):
     async def run(self, state: State) -> State:
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
+        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
 
         state.scores["novelty"] = score
         state.reasons["novelty"] = reason
@@ -128,11 +131,14 @@ class ScientificityAgent(BaseAgent):
     async def run(self, state: State) -> State:
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
+        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+
         state.scores["scientificity"] = score
         state.reasons["scientificity"] = reason
         state.scientificity_agent = data
@@ -156,11 +162,14 @@ class ReadabilityAgent(BaseAgent):
     async def run(self, state: State) -> State:
         
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
+        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+
         state.scores["readability"] = score
         state.reasons["readability"] = reason
         state.readability_agent = data
@@ -184,11 +193,14 @@ class ComplexityAgent(BaseAgent):
     async def run(self, state: State) -> State:
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
+        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+
         state.scores["complexity"] = score
         state.reasons["complexity"] = reason
         state.complexity_agent = data
@@ -210,14 +222,15 @@ class RawReviewAgent(BaseAgent):
     async def run(self, state: State) -> State:
 
         scores = {output['agent']: output['score'] for output in state.agents_outputs}
-    
         reasons = {output['agent']: output['reason'] for output in state.agents_outputs}
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         review = data.get("Review", response)
+        state.messages.append(AIMessage(content=f"{self.name}: raw_review={review}"))
 
         state.draft_review = review
 
@@ -240,11 +253,13 @@ class FinalReviewAgent(BaseAgent):
     async def run(self, state: State) -> State:
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{draft_review}", state.draft_review)
+        state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(prompt)
         data = extract_json(response)
 
         final_review = data.get("final_review", response)
         verdict = data.get("verdict", "undecided")
+        state.messages.append(AIMessage(content=f"{self.name}: final_review={final_review}, verdict={verdict}"))
 
         state.final_review = final_review
         state.verdict = verdict
