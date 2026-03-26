@@ -1,5 +1,6 @@
 # утилиты: парсинг json, работа с файлами, вспомогательные функции
 
+import yaml
 import json
 import re
 import os
@@ -52,7 +53,7 @@ def final_score(state) -> float:
 
 def print_json(obj):
     """
-    красиво печатает json
+    Красиво печатает объект, который можно преобразовать в словарь.
     """
     if hasattr(obj, "__dict__"):
         data = obj.__dict__
@@ -60,3 +61,8 @@ def print_json(obj):
         data = obj
     formatted_json = json.dumps(data, indent=4, ensure_ascii=False)
     print(formatted_json)
+
+def load_prompts():
+    with open("scientific_review/prompts.yaml", "r") as f:
+        PROMPTS = yaml.safe_load(f)
+    return PROMPTS
