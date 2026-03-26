@@ -1,9 +1,9 @@
-# агенты-оценщики: novelty, scientificity, readability, complexity
+# агенты: критерии и рецензенты. Каждый агент - отдельный класс с методом run, который принимает state и возвращает новый state.
+# BaseAgent - общий функционал, от которого наследуются все агенты. В нем можно хранить клиента, общие методы для парсинга и тд.
 
 from abc import ABC, abstractmethod
 import time
 
-from scientific_review.client import Client
 from scientific_review.utils import extract_json, load_prompts
 
 # для получения имен добавить отдельный метод с @property в BaseAgent
@@ -35,17 +35,16 @@ class BaseAgent(ABC):
     Базовый класс для всех агентов. Содержит общую логику и интерфейс.
     Все агенты должны наследоваться от этого класса и реализовывать метод run.
     """
-    def __init__(self, name):
+    def __init__(self, name, client):
         self.name = name
-        self.client = Client()
+        self.client = client
 
     @abstractmethod
     def run(self, state):
         """
         Метод, который должен быть реализован в каждом агенте. Принимает на вход state и возвращает новый state.
         """
-        ...
-        raise NotImplementedError("Метод run должен быть реализован в наследниках")
+        pass
     
     def analyze(self, state):
         """

@@ -1,8 +1,7 @@
 # основной multi-agent pipeline: запуск агентов и сбор финального результата
 
 from scientific_review.agents.state import State
-from scientific_review.agents.criteria_agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
-from scientific_review.agents.review_agents import RawReviewAgent, FinalReviewAgent
+from scientific_review.agents.agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent, RawReviewAgent, FinalReviewAgent
 from scientific_review.utils import final_score
 
 
