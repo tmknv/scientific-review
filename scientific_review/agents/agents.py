@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 import time
 import traceback
 
-from scientific_review.utils import extract_json, load_prompts
+from scientific_review.utils import extract_json, load_prompts, serialize_messages
 from scientific_review.agents.state import State
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -101,12 +101,22 @@ class NoveltyAgent(BaseAgent):
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.agents_outputs.append({
+            "agent": self.name,
+            "score": score,
+            "reason": reason
+        })
 
         state.scores["novelty"] = score
         state.reasons["novelty"] = reason
@@ -132,12 +142,22 @@ class ScientificityAgent(BaseAgent):
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.agents_outputs.append({
+            "agent": self.name,
+            "score": score,
+            "reason": reason
+        })
 
         state.scores["scientificity"] = score
         state.reasons["scientificity"] = reason
@@ -163,12 +183,22 @@ class ReadabilityAgent(BaseAgent):
         
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.agents_outputs.append({
+            "agent": self.name,
+            "score": score,
+            "reason": reason
+        })
 
         state.scores["readability"] = score
         state.reasons["readability"] = reason
@@ -194,12 +224,22 @@ class ComplexityAgent(BaseAgent):
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.agents_outputs.append({
+            "agent": self.name,
+            "score": score,
+            "reason": reason
+        })
 
         state.scores["complexity"] = score
         state.reasons["complexity"] = reason
@@ -226,8 +266,13 @@ class RawReviewAgent(BaseAgent):
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         review = data.get("Review", response)
         state.messages.append(AIMessage(content=f"{self.name}: raw_review={review}"))
@@ -254,8 +299,13 @@ class FinalReviewAgent(BaseAgent):
 
         prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{draft_review}", state.draft_review)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(prompt)
-        data = extract_json(response)
+        response = await self.client.generate(serialize_messages(state.messages))
+        try:
+            data = extract_json(response)
+        except Exception as e:
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            raise
 
         final_review = data.get("final_review", response)
         verdict = data.get("verdict", "undecided")

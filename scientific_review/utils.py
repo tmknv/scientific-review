@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Any, Dict, Union
 
 from scientific_review.agents.state import State
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 
 
 def message_to_dict(msg: BaseMessage) -> dict:
@@ -47,15 +47,15 @@ def extract_json(text: str) -> Dict[str, Any]:
 
     try:
         return json.loads(text)
-    except Exception as e:
-        print(f"Error occurred while parsing JSON: {e}")
+    except json.JSONDecodeError:
+        pass
 
-    match = re.search(r"\{.*\}", text, re.DOTALL)
+    match = re.search(r"\{.*?\}", text, re.DOTALL)
     if match:
         try:
             return json.loads(match.group())
-        except Exception as e:
-            print(f"Error occurred while parsing JSON from regex match: {e}")
+        except json.JSONDecodeError:
+            pass
 
     return {}
 
@@ -150,3 +150,32 @@ def state_to_dict(state: State) -> Dict[str, Any]:
     data["messages"] = [message_to_dict(msg) for msg in state.messages]
 
     return data
+
+def serialize_messages(messages: list) -> list[dict]:
+    """
+    Преобразует список LangChain сообщений (HumanMessage, AIMessage, SystemMessage)
+
+    args:
+        messages: Список сообщений в формате LangChain
+
+    returns:
+        Список словарей с ключами "role" и "content", готовых для передачи в LLM
+    """
+    serialized = []
+    
+    for m in messages:
+        if isinstance(m, HumanMessage):
+            role = "user"
+        elif isinstance(m, AIMessage):
+            role = "assistant"
+        elif isinstance(m, SystemMessage):
+            role = "system"
+        else:
+            raise ValueError(f"Unsupported message type: {type(m)}")
+        
+        serialized.append({
+            "role": role,
+            "content": m.content
+        })
+    
+    return serialized
