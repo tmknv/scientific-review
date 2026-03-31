@@ -1,1 +1,0 @@
-# быстрый запуск экспериментов (baseline vs multi-agent, stability, evaluation)

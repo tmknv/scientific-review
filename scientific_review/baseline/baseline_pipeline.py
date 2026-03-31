@@ -1,23 +1,49 @@
-# baseline pipeline: один вызов llm для генерации оценки и ревью
+# scientific_review/baseline/baseline_pipeline.py
+# baseline pipeline: один вызов llm для оценки и ревью
+
+from typing import Dict, Any
 
 from scientific_review.client import Client
-from scientific_review.config import PROMPTS
-from scientific_review.utils import extract_json
+from scientific_review.utils import build_prompt, extract_json
+from scientific_review.config import MODELS
 
 
 class BaselinePipeline:
-    def __init__(self):
-        self.client = Client()
+    """
+    Baseline pipeline.
 
-    def run(self, text):
-        prompt = PROMPTS["baseline"].format(text=text)
+    Один вызов LLM:
+    - генерирует оценки
+    - генерирует review
+    """
 
-        response = self.client.generate(prompt)
+    def __init__(self, client: Client):
+        """
+        Args:
+            client: LLM клиент
+        """
+        self.client = client
+
+
+    async def run(self, text: str) -> Dict[str, Any]:
+        """
+        Запускает baseline модель.
+
+        Args:
+            text: Текст статьи
+
+        Returns:
+            Результат baseline (scores, verdict, review, raw_output)
+        """
+        prompt = build_prompt("baseline", text=text)
+
+        response = await self.client.generate(prompt, model=MODELS["baseline"])
+
         data = extract_json(response)
 
         scores = data.get("scores", {})
 
-        result = {
+        return {
             "scores": {
                 "novelty": scores.get("novelty", -1),
                 "scientificity": scores.get("scientificity", -1),
@@ -25,9 +51,7 @@ class BaselinePipeline:
                 "complexity": scores.get("complexity", -1),
                 "final_score": data.get("final_score", -1),
             },
-            "verdict": data.get("verdict", "no verdict"),
+            "verdict": data.get("verdict", "unknown"),
             "review": data.get("review", response),
-            "raw_output": response
+            "raw_output": response,
         }
-
-        return result

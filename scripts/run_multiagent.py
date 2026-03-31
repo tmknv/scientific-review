@@ -1,3 +1,4 @@
+# scripts/run_multiagent.py
 # быстрый запуск multi-agent pipeline
 
 import asyncio
@@ -7,6 +8,15 @@ from scientific_review.client import Client
 
 
 async def main():
+    """
+    Запускает multi-agent pipeline на одном тексте.
+
+    Выполняет:
+    1) прогон мультиагентной системы
+    2) вывод результата в консоль
+    3) сохранение JSON артефакта в runs/multiagent
+    """
+
     # текст статьи
     text = """
     This paper proposes a novel machine learning approach for NLP tasks.

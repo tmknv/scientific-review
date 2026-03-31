@@ -1,3 +1,4 @@
+# scientific_review/config.py
 # загрузка .env, конфигурации
 
 import os
@@ -8,4 +9,8 @@ load_dotenv()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-
+MODELS = {
+    "baseline": "nvidia/nemotron-3-nano-30b-a3b:free",
+    "agent": "nvidia/nemotron-3-nano-30b-a3b:free",
+    "judge": "nvidia/nemotron-3-nano-30b-a3b:free",
+}
