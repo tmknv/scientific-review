@@ -61,7 +61,7 @@ def extract_json(text: str) -> Dict[str, Any]:
     except Exception as e:
         print(f"Ошибка парсинга JSON: {e}")
 
-    match = re.search(r"\{.*\}", text, re.DOTALL)
+    match = re.search(r"\{.*?\}", text, re.DOTALL)
     if match:
         try:
             return json.loads(match.group())
