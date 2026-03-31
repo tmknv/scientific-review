@@ -66,7 +66,7 @@ class State:
     """
 
     # вход
-    text: str = ""
+    text: Annotated[list[str], operator.add]
  
     # short-term memory
     messages: Annotated[List[BaseMessage], add_messages] = field(default_factory=list)

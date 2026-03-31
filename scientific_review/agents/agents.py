@@ -57,6 +57,12 @@ class BaseAgent(ABC):
         """
         pass
     
+    async def ainvoke(self, state):
+        """
+        Метод для интеграции с LangGraph. Принимает State, вызывает run, возвращает State.
+        """
+        return await self.run(state)
+    
     async def analyze(self, state: State) -> State:
         """
         Метод для запуска агента с обработкой ошибок и временем выполнения.
@@ -99,7 +105,7 @@ class NoveltyAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
@@ -140,7 +146,7 @@ class ScientificityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
@@ -181,7 +187,7 @@ class ReadabilityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
         
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
@@ -222,7 +228,7 @@ class ComplexityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text)
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
@@ -264,7 +270,7 @@ class RawReviewAgent(BaseAgent):
         scores = {output['agent']: output['score'] for output in state.agents_outputs}
         reasons = {output['agent']: output['reason'] for output in state.agents_outputs}
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0]).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
@@ -297,7 +303,7 @@ class FinalReviewAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text).replace("{draft_review}", state.draft_review)
+        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0]).replace("{draft_review}", state.draft_review)
         state.messages.append(HumanMessage(content=prompt))
         response = await self.client.generate(serialize_messages(state.messages))
         try:
