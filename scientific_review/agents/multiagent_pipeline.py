@@ -2,7 +2,7 @@
 
 import asyncio
 import copy
-from langgraph.graph import START, StateGraph, END, Annotated
+from langgraph.graph import START, StateGraph, END
 from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
 
 from scientific_review.client import Client
@@ -48,17 +48,21 @@ class MultiAgentPipeline:
 
         workflow = StateGraph(state_schema=State)
         
-        for name in self.agents.keys():
-            workflow.add_edge(START, name)
-
         for name, agent in self.agents.items():
             workflow.add_node(name, agent.ainvoke)
+            workflow.add_edge(START, name) 
 
+        # workflow.add_node("aggregator", aggregator)
         workflow.add_node("raw_review", self.raw_review_agent.ainvoke)
         workflow.add_node("final_review", self.final_review_agent.ainvoke)
 
+        # for agent_name in self.agents.keys():
+        #     workflow.add_edge(agent_name, "aggregator")
+
         for agent_name in self.agents.keys():
-            workflow.add_edge(agent_name, Annotated("raw_review", key=agent_name))
+            workflow.add_edge(agent_name, "raw_review")
+
+        # workflow.add_edge("aggregator", "raw_review")
 
         workflow.add_edge("raw_review", "final_review")
 
@@ -78,6 +82,11 @@ class MultiAgentPipeline:
         """
         initial_state = State(text=text, messages=[SystemMessage(content=text)])
         final_state = await self.workflow.ainvoke(initial_state)
+
+        if not isinstance(final_state, State):
+            final_state = State(**final_state)
+        else:
+            final_state = final_state
 
         final_state.scores["final_score"] = final_score(final_state)
 

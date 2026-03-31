@@ -5,7 +5,8 @@ from abc import ABC, abstractmethod
 import time
 import traceback
 
-from scientific_review.utils import extract_json, load_prompts, serialize_messages
+from scientific_review.config import MODELS
+from scientific_review.utils import extract_json, build_prompt, serialize_messages
 from scientific_review.agents.state import State
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -105,9 +106,9 @@ class NoveltyAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
+        prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:
@@ -118,16 +119,13 @@ class NoveltyAgent(BaseAgent):
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
-        state.agents_outputs.append({
-            "agent": self.name,
+        state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
-        })
+        }
 
         state.scores["novelty"] = score
         state.reasons["novelty"] = reason
-        state.novelty_agent = data
-
         return state
 
 
@@ -146,9 +144,9 @@ class ScientificityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
+        prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:
@@ -159,15 +157,13 @@ class ScientificityAgent(BaseAgent):
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
-        state.agents_outputs.append({
-            "agent": self.name,
+        state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
-        })
+        }
 
         state.scores["scientificity"] = score
         state.reasons["scientificity"] = reason
-        state.scientificity_agent = data
         return state
 
 
@@ -187,9 +183,9 @@ class ReadabilityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
         
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
+        prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:
@@ -200,15 +196,13 @@ class ReadabilityAgent(BaseAgent):
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
-        state.agents_outputs.append({
-            "agent": self.name,
+        state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
-        })
+        }
 
         state.scores["readability"] = score
         state.reasons["readability"] = reason
-        state.readability_agent = data
         return state
 
 
@@ -228,9 +222,9 @@ class ComplexityAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0])
+        prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:
@@ -241,15 +235,13 @@ class ComplexityAgent(BaseAgent):
         score = data.get("score", -1)
         reason = data.get("reason", "")
         state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
-        state.agents_outputs.append({
-            "agent": self.name,
+        state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
-        })
+        }
 
         state.scores["complexity"] = score
         state.reasons["complexity"] = reason
-        state.complexity_agent = data
         return state
 
 class RawReviewAgent(BaseAgent):
@@ -267,12 +259,12 @@ class RawReviewAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        scores = {output['agent']: output['score'] for output in state.agents_outputs}
-        reasons = {output['agent']: output['reason'] for output in state.agents_outputs}
+        scores = state.scores
+        reasons = state.reasons
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0]).replace("{scores}", str(scores)).replace("{reasons}", str(reasons))
+        prompt = build_prompt(self.name, text=state.text, scores=scores, reasons=reasons)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:
@@ -296,16 +288,16 @@ class FinalReviewAgent(BaseAgent):
     
     Заполняет:
     state.final_review - текст финального ревью
-    state.verdict - строка "accept", "reject" или "undecided"
+    state.verdict - "accept / minor revision / major revision / reject"
     """
     def __init__(self, client):
         super().__init__(name = 'final_review_agent', client=client)
 
     async def run(self, state: State) -> State:
 
-        prompt = load_prompts().get(self.name, "").replace("{text}", state.text[0]).replace("{draft_review}", state.draft_review)
+        prompt = build_prompt(self.name, text=state.text, draft_review=state.draft_review)
         state.messages.append(HumanMessage(content=prompt))
-        response = await self.client.generate(serialize_messages(state.messages))
+        response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
         try:
             data = extract_json(response)
         except Exception as e:

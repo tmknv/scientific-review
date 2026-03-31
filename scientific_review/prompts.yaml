@@ -69,7 +69,7 @@ baseline:
       },
       "final_score": number (1-10),
       "verdict": "accept/revise/reject",
-      "review": "concise but informative review covering all four dimensions"
+      "review": "cohesive, professional review text, 1–3 paragraphs"
     }
 
     Constraints:

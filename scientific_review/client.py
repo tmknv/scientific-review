@@ -2,6 +2,7 @@
 # Асинхронный клиент OpenRouter для всех агентов и baseline
 
 import aiohttp
+from typing import List, Dict
 
 from scientific_review.config import OPENROUTER_API_KEY
 
@@ -36,12 +37,12 @@ class Client:
             await self.session.close()
             self.session = None
 
-    async def generate(self, prompt: str, model: str) -> str:
+    async def generate(self, messages: List[Dict], model: str) -> str:
         """
         Асинхронно отправляет запрос в OpenRouter и возвращает результат.
 
         Args:
-            prompt: Строка запроса
+            messages: Список сообщений в формате [{"role": "user", "content": "..."}]
             model: Модель 
 
         Returns:
@@ -53,7 +54,7 @@ class Client:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         payload = {
             "model": model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": messages,
         }
 
         try:

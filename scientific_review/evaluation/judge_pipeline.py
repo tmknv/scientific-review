@@ -45,7 +45,9 @@ class JudgePipeline:
             baseline_review=baseline_result.get("review", ""), 
             multiagent_review=multiagent_result.get("review", ""))
 
-        response = await self.client.generate(prompt, model=MODELS["judge"])
+        messages = [{"role": "user", "content": prompt}]
+
+        response = await self.client.generate(messages, model=MODELS["judge"])
 
         data = extract_json(response)
 

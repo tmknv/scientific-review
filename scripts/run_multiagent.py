@@ -18,9 +18,9 @@ async def main():
     """
 
     # текст статьи
-    text = ["""
+    text = """
     This paper proposes a novel machine learning approach for NLP tasks.
-    """]
+    """
     async with Client() as client:
         pipeline = MultiAgentPipeline(client=client)
         state = await pipeline.run(text)

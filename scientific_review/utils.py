@@ -129,19 +129,6 @@ def print_json(state: State) -> None:
     print(formatted_json)
 
 
-def load_prompts() -> Dict[str, str]:
-    """
-    Загружает шаблоны промптов из YAML-файла конфигурации.
-
-    Returns:
-        Словарь, где ключи - названия, а значения - текст промптов
-    """
-    with open("scientific_review/prompts.yaml", "r") as f:
-        PROMPTS = yaml.safe_load(f)
-
-    return PROMPTS
-
-
 def message_to_dict(msg: BaseMessage) -> Dict[str, Any]:
     """
     Преобразует объект сообщения LLM в словарь для json-формата.
@@ -169,8 +156,13 @@ def state_to_dict(state: State) -> Dict[str, Any]:
     Returns:
         Словарь с данными из State, готовый для json-формата
     """
-    data = state.__dict__.copy()
-    data["messages"] = [message_to_dict(msg) for msg in state.messages]
+    if isinstance(state, dict):
+        data = state.copy()
+        if "messages" in data:
+            data["messages"] = [message_to_dict(msg) for msg in data["messages"]]
+    else:
+        data = state.__dict__.copy()
+        data["messages"] = [message_to_dict(msg) for msg in getattr(state, "messages", [])]
 
     return data
 

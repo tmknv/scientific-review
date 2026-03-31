@@ -36,8 +36,9 @@ class BaselinePipeline:
             Результат baseline (scores, verdict, review, raw_output)
         """
         prompt = build_prompt("baseline", text=text)
+        messages = [{"role": "user", "content": prompt}]
 
-        response = await self.client.generate(prompt, model=MODELS["baseline"])
+        response = await self.client.generate(messages=messages, model=MODELS["baseline"])
 
         data = extract_json(response)
 
