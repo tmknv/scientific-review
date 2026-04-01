@@ -1,0 +1,242 @@
+{
+  "num_samples": 2,
+  "metrics": {
+    "baseline_vs_multiagent_avg": 0.0,
+    "baseline_vs_human_avg": 0.0,
+    "multiagent_vs_human_avg": 0.0
+  },
+  "results": [
+    {
+      "baseline": {
+        "scores": {
+          "novelty": -1,
+          "scientificity": -1,
+          "readability": -1,
+          "complexity": -1,
+          "final_score": -1
+        },
+        "verdict": "unknown",
+        "review": "",
+        "raw_output": ""
+      },
+      "multiagent": {
+        "text": "This paper proposes a novel machine learning method for NLP.",
+        "messages": [
+          {
+            "type": "system",
+            "content": "This paper proposes a novel machine learning method for NLP."
+          },
+          {
+            "type": "human",
+            "content": "You are an expert analyst specializing in evaluating the intellectual and structural complexity of texts.\nYou are skilled at identifying depth of reasoning, conceptual difficulty, and cognitive demands on the reader.\n\nGoal:\nEvaluate the complexity of the given text.\nFocus on how intellectually demanding the text is in terms of concepts, reasoning, and structure.\nDo NOT evaluate scientific quality, readability, or novelty — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Depth of ideas and level of abstraction\n   B. Complexity of arguments and reasoning chains\n   C. Use of advanced or specialized concepts\n   D. Density of information and conceptual load\n3. Based on the above, assign a complexity score from 0 to 10:\n   - 0–2: Very simple (basic ideas, minimal reasoning)\n   - 3–5: Low complexity (some structure but mostly straightforward)\n   - 6–8: Moderately complex (multi-step reasoning, deeper ideas)\n   - 9–10: Highly complex (dense, abstract, cognitively demanding)\n\nExecution Guidance:\n- Identify how much effort is required to fully understand the text.\n- Focus on conceptual depth rather than clarity or readability.\n- Base your judgment only on complexity-related factors.\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on complexity\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, readability, or novelty.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text is too simple or too short to assess complexity properly, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer specializing in evaluating the originality and novelty of research and written work.\nYou are experienced in identifying new ideas, contributions, and distinctions from existing knowledge.\n\nGoal:\nEvaluate the novelty of the given text.\nFocus on how original, innovative, or non-trivial the ideas are.\nDo NOT evaluate scientific quality, readability, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Presence of new ideas, insights, or perspectives\n   B. Degree of originality compared to common or well-known knowledge\n   C. Evidence of unique contribution or non-obvious conclusions\n   D. Avoidance of generic, repetitive, or widely known statements\n3. Based on the above, assign a novelty score from 0 to 10:\n   - 0–2: Not novel (common knowledge, generic content)\n   - 3–5: Low novelty (some variation but mostly familiar ideas)\n   - 6–8: Moderately novel (contains interesting or partially original insights)\n   - 9–10: Highly novel (clearly original, innovative, or insightful)\n\nExecution Guidance:\n- Select the most relevant indicators of originality.\n- Identify whether the text adds new value beyond widely known information.\n- Base your judgment only on novelty-related factors.\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on novelty\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, readability, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text lacks sufficient content to assess novelty, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert editor and linguist specializing in evaluating the readability of written texts.\nYou have extensive experience in assessing clarity, structure, coherence, and accessibility for different audiences.\n\nGoal:\nEvaluate the readability of the given text.\nFocus on how easy the text is to read, understand, and follow for a general educated audience.\nDo NOT evaluate scientific quality, novelty, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Clarity of language (simplicity vs. unnecessary difficulty)\n   B. Sentence structure (length, flow, and grammatical clarity)\n   C. Logical flow and organization of ideas\n   D. Use of jargon or technical terms and whether they are explained\n   E. Overall ease of understanding for a non-specialist reader\n3. Based on the above, assign a readability score from 0 to 10:\n   - 0–2: Very hard to read (confusing, incoherent, or extremely dense)\n   - 3–5: Difficult to read (frequent complexity, unclear structure)\n   - 6–8: Moderately readable (generally clear but with some issues)\n   - 9–10: Highly readable (clear, well-structured, easy to follow)\n\nExecution Guidance:\n- Select the most relevant evaluation criteria for readability.\n- From the input text, identify strengths and weaknesses in clarity, structure, and accessibility.\n- Base your judgment only on readability-related factors.\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on readability\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, novelty, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text is too short or lacks enough information to assess readability, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer with deep experience in evaluating the scientific quality of research papers across disciplines. \nYou specialize in assessing rigor, methodology, evidence quality, and adherence to scientific standards.\n\nGoal:\nEvaluate the scientific quality (\"scientificity\") of the given paper. \nFocus on how well the text adheres to scientific principles such as rigor, clarity of methodology, use of evidence, logical consistency, and objectivity.\nDo NOT evaluate novelty, readability, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided paper.\n2. Assess the following aspects:\n   A. Presence and clarity of research objective or hypothesis\n   B. Soundness and transparency of methodology (if applicable)\n   C. Use of evidence, data, or references to support claims\n   D. Logical consistency and absence of contradictions\n   E. Objectivity and avoidance of unsupported opinions\n3. Based on the above, assign a scientificity score from 0 to 10:\n   - 0–2: Not scientific (opinion-based, no evidence, no structure)\n   - 3–5: Weak scientific grounding (some structure but lacks rigor or evidence)\n   - 6–8: Moderately scientific (generally sound but with some gaps)\n   - 9–10: Highly scientific (rigorous, well-supported, methodologically sound)\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on scientific quality\"\n}\n\nConstraints:\n- Do NOT comment on novelty, readability, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text lacks enough information to evaluate scientificity, assign a low score and explain why.\n"
+          },
+          {
+            "type": "ai",
+            "content": "complexity: score=-1, reason="
+          },
+          {
+            "type": "ai",
+            "content": "novelty: score=-1, reason="
+          },
+          {
+            "type": "ai",
+            "content": "scientificity: score=-1, reason="
+          },
+          {
+            "type": "ai",
+            "content": "readability: score=-1, reason="
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer with extensive experience evaluating scientific and analytical texts across disciplines.\nYour expertise covers assessing originality, rigor, readability, and conceptual complexity.\nYou provide professional, human-like reviews suitable for peer-reviewed publications.\n\nGoal:\nWrite a coherent, professional review of the given article by synthesizing the scores and explanations provided by the individual agents: novelty, scientificity, readability, and complexity.\nFocus on providing an overall assessment, highlighting strengths, weaknesses, and any notable trade-offs between dimensions.\n\nInstructions:\n1. Select the most relevant information from the provided scores and reasons.\n2. Integrate them into a cohesive narrative instead of listing them separately.\n3. Analyze key aspects:\n   A. Strengths of the article across novelty, scientificity, readability, and complexity\n   B. Weaknesses or areas needing improvement\n   C. Trade-offs or conflicts (e.g., high scientific rigor may reduce readability)\n4. Write the review in the voice of a human expert reviewer, maintaining a professional and constructive tone.\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nScores:\n{'complexity': -1, 'novelty': -1, 'scientificity': -1, 'readability': -1}\n\nReasons:\n{'complexity': '', 'novelty': '', 'scientificity': '', 'readability': ''}\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"Review\": \"coherent text, 1–3 well-structured paragraphs\"\n}\n\n\nConstraints:\n- Do NOT list scores or reasons separately.\n- Do NOT include any text outside the \"Review\" section.\n- Keep the review concise, clear, and informative.\n- Ensure the narrative reflects the balance between the four dimensions.\n- If the paper lacks sufficient information, note this in the review.\n"
+          },
+          {
+            "type": "ai",
+            "content": "raw_review_agent: raw_review="
+          },
+          {
+            "type": "human",
+            "content": "You are an expert scientific reviewer with extensive experience in evaluating academic and analytical texts.\nYour task is to produce a professional, coherent final review based on a draft review prepared by preliminary agents.\n\nGoal:\nWrite a polished, coherent final review of the provided article by synthesizing the draft review from preliminary agents.\n\nInstructions:\n1. Analyze the draft review () and the full text of the article (This paper proposes a novel machine learning method for NLP.).\n2. Synthesize the key points into a cohesive text (1–3 paragraphs).\n3. Highlight the main strengths and weaknesses of the article.\n4. Note any conflicts or trade-offs (e.g., high readability vs. low scientific depth).\n5. Provide a clear final verdict: accept / minor revision / major revision / reject.\n6. Write the answer in Russian.\n\nContext:\nPaper:\nThis paper proposes a novel machine learning method for NLP.\n\nDraft Review:\n\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"final_review\": \"cohesive, professional review text, 1–3 paragraphs\",\n  \"verdict\": \"accept / minor revision / major revision / reject\"\n}\n\nConstraints:\n- Output only the JSON object.\n- Do not list reasons or scores separately.\n- Ensure the review is clear, informative, and balanced.\n- Reflect the relationships between all key aspects of the paper.\n- If the draft or article lacks sufficient information, note this in the review.\n"
+          },
+          {
+            "type": "ai",
+            "content": "final_review_agent: final_review=, verdict=undecided"
+          }
+        ],
+        "scores": {
+          "complexity": -1,
+          "novelty": -1,
+          "scientificity": -1,
+          "readability": -1,
+          "final_score": -1.0
+        },
+        "reasons": {
+          "complexity": "",
+          "novelty": "",
+          "scientificity": "",
+          "readability": ""
+        },
+        "draft_review": "",
+        "final_review": "",
+        "verdict": "undecided",
+        "agents_outputs": {
+          "complexity": {
+            "score": -1,
+            "reason": ""
+          },
+          "novelty": {
+            "score": -1,
+            "reason": ""
+          },
+          "scientificity": {
+            "score": -1,
+            "reason": ""
+          },
+          "readability": {
+            "score": -1,
+            "reason": ""
+          }
+        },
+        "metadata": {}
+      },
+      "metrics": {
+        "baseline_vs_multiagent": 0.0
+      },
+      "judge": {
+        "winner": "unknown",
+        "score_baseline": -1,
+        "score_multiagent": -1,
+        "reason": "",
+        "raw_output": ""
+      }
+    },
+    {
+      "baseline": {
+        "scores": {
+          "novelty": -1,
+          "scientificity": -1,
+          "readability": -1,
+          "complexity": -1,
+          "final_score": -1
+        },
+        "verdict": "unknown",
+        "review": "",
+        "raw_output": ""
+      },
+      "multiagent": {
+        "text": "We study optimization techniques for deep neural networks.",
+        "messages": [
+          {
+            "type": "system",
+            "content": "We study optimization techniques for deep neural networks."
+          },
+          {
+            "type": "human",
+            "content": "You are an expert analyst specializing in evaluating the intellectual and structural complexity of texts.\nYou are skilled at identifying depth of reasoning, conceptual difficulty, and cognitive demands on the reader.\n\nGoal:\nEvaluate the complexity of the given text.\nFocus on how intellectually demanding the text is in terms of concepts, reasoning, and structure.\nDo NOT evaluate scientific quality, readability, or novelty — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Depth of ideas and level of abstraction\n   B. Complexity of arguments and reasoning chains\n   C. Use of advanced or specialized concepts\n   D. Density of information and conceptual load\n3. Based on the above, assign a complexity score from 0 to 10:\n   - 0–2: Very simple (basic ideas, minimal reasoning)\n   - 3–5: Low complexity (some structure but mostly straightforward)\n   - 6–8: Moderately complex (multi-step reasoning, deeper ideas)\n   - 9–10: Highly complex (dense, abstract, cognitively demanding)\n\nExecution Guidance:\n- Identify how much effort is required to fully understand the text.\n- Focus on conceptual depth rather than clarity or readability.\n- Base your judgment only on complexity-related factors.\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on complexity\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, readability, or novelty.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text is too simple or too short to assess complexity properly, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer specializing in evaluating the originality and novelty of research and written work.\nYou are experienced in identifying new ideas, contributions, and distinctions from existing knowledge.\n\nGoal:\nEvaluate the novelty of the given text.\nFocus on how original, innovative, or non-trivial the ideas are.\nDo NOT evaluate scientific quality, readability, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Presence of new ideas, insights, or perspectives\n   B. Degree of originality compared to common or well-known knowledge\n   C. Evidence of unique contribution or non-obvious conclusions\n   D. Avoidance of generic, repetitive, or widely known statements\n3. Based on the above, assign a novelty score from 0 to 10:\n   - 0–2: Not novel (common knowledge, generic content)\n   - 3–5: Low novelty (some variation but mostly familiar ideas)\n   - 6–8: Moderately novel (contains interesting or partially original insights)\n   - 9–10: Highly novel (clearly original, innovative, or insightful)\n\nExecution Guidance:\n- Select the most relevant indicators of originality.\n- Identify whether the text adds new value beyond widely known information.\n- Base your judgment only on novelty-related factors.\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on novelty\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, readability, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text lacks sufficient content to assess novelty, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert editor and linguist specializing in evaluating the readability of written texts.\nYou have extensive experience in assessing clarity, structure, coherence, and accessibility for different audiences.\n\nGoal:\nEvaluate the readability of the given text.\nFocus on how easy the text is to read, understand, and follow for a general educated audience.\nDo NOT evaluate scientific quality, novelty, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided text.\n2. Assess the following aspects:\n   A. Clarity of language (simplicity vs. unnecessary difficulty)\n   B. Sentence structure (length, flow, and grammatical clarity)\n   C. Logical flow and organization of ideas\n   D. Use of jargon or technical terms and whether they are explained\n   E. Overall ease of understanding for a non-specialist reader\n3. Based on the above, assign a readability score from 0 to 10:\n   - 0–2: Very hard to read (confusing, incoherent, or extremely dense)\n   - 3–5: Difficult to read (frequent complexity, unclear structure)\n   - 6–8: Moderately readable (generally clear but with some issues)\n   - 9–10: Highly readable (clear, well-structured, easy to follow)\n\nExecution Guidance:\n- Select the most relevant evaluation criteria for readability.\n- From the input text, identify strengths and weaknesses in clarity, structure, and accessibility.\n- Base your judgment only on readability-related factors.\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on readability\"\n}\n\nConstraints:\n- Do NOT comment on scientificity, novelty, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text is too short or lacks enough information to assess readability, assign a low score and explain why.\n"
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer with deep experience in evaluating the scientific quality of research papers across disciplines. \nYou specialize in assessing rigor, methodology, evidence quality, and adherence to scientific standards.\n\nGoal:\nEvaluate the scientific quality (\"scientificity\") of the given paper. \nFocus on how well the text adheres to scientific principles such as rigor, clarity of methodology, use of evidence, logical consistency, and objectivity.\nDo NOT evaluate novelty, readability, or complexity — those are handled by other agents.\n\nInstructions:\n1. Analyze the provided paper.\n2. Assess the following aspects:\n   A. Presence and clarity of research objective or hypothesis\n   B. Soundness and transparency of methodology (if applicable)\n   C. Use of evidence, data, or references to support claims\n   D. Logical consistency and absence of contradictions\n   E. Objectivity and avoidance of unsupported opinions\n3. Based on the above, assign a scientificity score from 0 to 10:\n   - 0–2: Not scientific (opinion-based, no evidence, no structure)\n   - 3–5: Weak scientific grounding (some structure but lacks rigor or evidence)\n   - 6–8: Moderately scientific (generally sound but with some gaps)\n   - 9–10: Highly scientific (rigorous, well-supported, methodologically sound)\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"score\": number (0-10),\n  \"reason\": \"concise explanation focusing only on scientific quality\"\n}\n\nConstraints:\n- Do NOT comment on novelty, readability, or complexity.\n- Do NOT include any text outside the JSON.\n- Keep the explanation brief (1–3 sentences).\n- If the text lacks enough information to evaluate scientificity, assign a low score and explain why.\n"
+          },
+          {
+            "type": "ai",
+            "content": "readability: score=-1, reason="
+          },
+          {
+            "type": "ai",
+            "content": "complexity: score=-1, reason="
+          },
+          {
+            "type": "ai",
+            "content": "novelty: score=1, reason=The text merely mentions studying optimization techniques for deep neural networks without introducing any specific, original ideas or contributions. It reflects a generic research focus rather than novel insight."
+          },
+          {
+            "type": "ai",
+            "content": "scientificity: score=1, reason=The excerpt lacks a clear research objective, methodology, evidence, or logical argument, offering only a generic statement without scientific substance."
+          },
+          {
+            "type": "human",
+            "content": "You are an expert academic reviewer with extensive experience evaluating scientific and analytical texts across disciplines.\nYour expertise covers assessing originality, rigor, readability, and conceptual complexity.\nYou provide professional, human-like reviews suitable for peer-reviewed publications.\n\nGoal:\nWrite a coherent, professional review of the given article by synthesizing the scores and explanations provided by the individual agents: novelty, scientificity, readability, and complexity.\nFocus on providing an overall assessment, highlighting strengths, weaknesses, and any notable trade-offs between dimensions.\n\nInstructions:\n1. Select the most relevant information from the provided scores and reasons.\n2. Integrate them into a cohesive narrative instead of listing them separately.\n3. Analyze key aspects:\n   A. Strengths of the article across novelty, scientificity, readability, and complexity\n   B. Weaknesses or areas needing improvement\n   C. Trade-offs or conflicts (e.g., high scientific rigor may reduce readability)\n4. Write the review in the voice of a human expert reviewer, maintaining a professional and constructive tone.\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nScores:\n{'readability': -1, 'complexity': -1, 'novelty': 1, 'scientificity': 1}\n\nReasons:\n{'readability': '', 'complexity': '', 'novelty': 'The text merely mentions studying optimization techniques for deep neural networks without introducing any specific, original ideas or contributions. It reflects a generic research focus rather than novel insight.', 'scientificity': 'The excerpt lacks a clear research objective, methodology, evidence, or logical argument, offering only a generic statement without scientific substance.'}\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"Review\": \"coherent text, 1–3 well-structured paragraphs\"\n}\n\n\nConstraints:\n- Do NOT list scores or reasons separately.\n- Do NOT include any text outside the \"Review\" section.\n- Keep the review concise, clear, and informative.\n- Ensure the narrative reflects the balance between the four dimensions.\n- If the paper lacks sufficient information, note this in the review.\n"
+          },
+          {
+            "type": "ai",
+            "content": "raw_review_agent: raw_review="
+          },
+          {
+            "type": "human",
+            "content": "You are an expert scientific reviewer with extensive experience in evaluating academic and analytical texts.\nYour task is to produce a professional, coherent final review based on a draft review prepared by preliminary agents.\n\nGoal:\nWrite a polished, coherent final review of the provided article by synthesizing the draft review from preliminary agents.\n\nInstructions:\n1. Analyze the draft review () and the full text of the article (We study optimization techniques for deep neural networks.).\n2. Synthesize the key points into a cohesive text (1–3 paragraphs).\n3. Highlight the main strengths and weaknesses of the article.\n4. Note any conflicts or trade-offs (e.g., high readability vs. low scientific depth).\n5. Provide a clear final verdict: accept / minor revision / major revision / reject.\n6. Write the answer in Russian.\n\nContext:\nPaper:\nWe study optimization techniques for deep neural networks.\n\nDraft Review:\n\n\nResponse Format:\nReturn STRICT JSON:\n{\n  \"final_review\": \"cohesive, professional review text, 1–3 paragraphs\",\n  \"verdict\": \"accept / minor revision / major revision / reject\"\n}\n\nConstraints:\n- Output only the JSON object.\n- Do not list reasons or scores separately.\n- Ensure the review is clear, informative, and balanced.\n- Reflect the relationships between all key aspects of the paper.\n- If the draft or article lacks sufficient information, note this in the review.\n"
+          },
+          {
+            "type": "ai",
+            "content": "final_review_agent: final_review=, verdict=undecided"
+          }
+        ],
+        "scores": {
+          "readability": -1,
+          "complexity": -1,
+          "novelty": 1,
+          "scientificity": 1,
+          "final_score": 0.0
+        },
+        "reasons": {
+          "readability": "",
+          "complexity": "",
+          "novelty": "The text merely mentions studying optimization techniques for deep neural networks without introducing any specific, original ideas or contributions. It reflects a generic research focus rather than novel insight.",
+          "scientificity": "The excerpt lacks a clear research objective, methodology, evidence, or logical argument, offering only a generic statement without scientific substance."
+        },
+        "draft_review": "",
+        "final_review": "",
+        "verdict": "undecided",
+        "agents_outputs": {
+          "readability": {
+            "score": -1,
+            "reason": ""
+          },
+          "complexity": {
+            "score": -1,
+            "reason": ""
+          },
+          "novelty": {
+            "score": 1,
+            "reason": "The text merely mentions studying optimization techniques for deep neural networks without introducing any specific, original ideas or contributions. It reflects a generic research focus rather than novel insight."
+          },
+          "scientificity": {
+            "score": 1,
+            "reason": "The excerpt lacks a clear research objective, methodology, evidence, or logical argument, offering only a generic statement without scientific substance."
+          }
+        },
+        "metadata": {}
+      },
+      "metrics": {
+        "baseline_vs_multiagent": 0.0
+      },
+      "judge": {
+        "winner": "unknown",
+        "score_baseline": -1,
+        "score_multiagent": -1,
+        "reason": "",
+        "raw_output": ""
+      }
+    }
+  ]
+}
