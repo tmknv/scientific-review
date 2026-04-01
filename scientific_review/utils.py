@@ -56,19 +56,52 @@ def extract_json(text: str) -> Dict[str, Any]:
         Словарь с данными из json или пустой словарь, если парсинг не удался.
     """
 
+    if not text:
+        return {}
+
+    # пробуем как есть
     try:
         return json.loads(text)
-    except Exception as e:
-        print(f"Ошибка парсинга JSON: {e}")
+    except:
+        pass
 
+    # ищем первый {...}
     match = re.search(r"\{.*?\}", text, re.DOTALL)
     if match:
+        candidate = match.group()
+
         try:
-            return json.loads(match.group())
-        except Exception as e:
-            print(f"Ошибка парсинга JSON после регулярного выражения: {e}")
+            return json.loads(candidate)
+        except:
+            try:
+                return json.loads(candidate.replace("'", '"'))
+            except:
+                pass
 
     return {}
+
+
+def serialize(obj):
+    # langchain messages
+    if isinstance(obj, BaseMessage):
+        return {
+            "type": obj.type,
+            "content": obj.content
+        }
+
+    # State / любые объекты
+    if hasattr(obj, "__dict__"):
+        return {k: serialize(v) for k, v in obj.__dict__.items()}
+
+    # list
+    if isinstance(obj, list):
+        return [serialize(x) for x in obj]
+
+    # dict
+    if isinstance(obj, dict):
+        return {k: serialize(v) for k, v in obj.items()}
+
+    return obj
 
 
 def save_json(data: Union[Dict[str, Any], list], folder: str) -> str:
@@ -91,7 +124,7 @@ def save_json(data: Union[Dict[str, Any], list], folder: str) -> str:
     path = os.path.join(folder, name)
 
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        json.dump(serialize(data), f, indent=2, ensure_ascii=False)
 
     return path
 
@@ -167,24 +200,6 @@ def state_to_dict(state: State) -> Dict[str, Any]:
     return data
 
 
-# def extract_scores(result: Dict[str, Any]) -> List[float]:
-#     """
-#     Извлекает оценки в фиксированном порядке.
-
-#     Args:
-#         result: Результат работы пайплайна в виде словаря
-
-#     Returns:
-#         Список оценок: [novelty, scientificity, readability, complexity]
-#     """
-#     scores = result.get("scores", {})
-
-#     return [
-#         scores.get("novelty", -1),
-#         scores.get("scientificity", -1),
-#         scores.get("readability", -1),
-#         scores.get("complexity", -1),
-#     ]
 def extract_scores(result: Union[Dict[str, Any], State]) -> List[float]:
     """
     Извлекает оценки в фиксированном порядке.
@@ -195,7 +210,7 @@ def extract_scores(result: Union[Dict[str, Any], State]) -> List[float]:
     Returns:
         Список оценок: [novelty, scientificity, readability, complexity]
     """
-    # Получаем словарь оценок
+    # получаем словарь оценок
     if isinstance(result, State):
         scores = result.scores
     elif isinstance(result, dict):
@@ -203,13 +218,14 @@ def extract_scores(result: Union[Dict[str, Any], State]) -> List[float]:
     else:
         raise TypeError(f"Unexpected result type: {type(result)}")
 
-    # Возвращаем список оценок в нужном порядке, -1 если отсутствует
+    # возвращаем список оценок в нужном порядке, -1 если отсутствует
     return [
         scores.get("novelty", -1),
         scores.get("scientificity", -1),
         scores.get("readability", -1),
         scores.get("complexity", -1),
     ]
+
 
 def serialize_messages(messages: List) -> List[Dict]:
     """

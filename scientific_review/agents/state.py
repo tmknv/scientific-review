@@ -47,14 +47,6 @@ class State:
         reasons: Объяснения оценок по каждому критерию
             Пример: {"novelty": "...", "readability": "..."}
 
-        novelty_agent: Внутреннее состояние агента новизны
-        scientificity_agent: Внутреннее состояние агента научности
-        readability_agent: Внутреннее состояние агента читаемости
-        complexity_agent: Внутреннее состояние агента сложности
-
-        review_agent: Состояние агента чернового ревью
-        final_review_agent: Состояние финального агента
-
         draft_review: Черновой текст рецензии
         final_review: Финальный текст рецензии
         verdict: Итоговое решение (accept / revise / reject)

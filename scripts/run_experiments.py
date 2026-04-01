@@ -49,14 +49,14 @@ async def run_experiments(texts: List[str], human_scores: Optional[List[List[flo
         print(f"Dataset results saved to: {dataset_path}")
 
         # stability evaluation 
-        stability_result = await evaluate_stability(
-            text=texts[0],
-            baseline_pipeline=baseline_pipeline,
-            multiagent_pipeline=multiagent_pipeline,
-        )
+        # stability_result = await evaluate_stability(
+        #     text=texts[0],
+        #     baseline_pipeline=baseline_pipeline,
+        #     multiagent_pipeline=multiagent_pipeline,
+        # )
 
-        stability_path = save_json(stability_result, "runs/stability")
-        print(f"Stability results saved to: {stability_path}")
+        # stability_path = save_json(stability_result, "runs/stability")
+        # print(f"Stability results saved to: {stability_path}")
 
 
 async def main():
