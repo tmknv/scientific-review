@@ -59,9 +59,20 @@ class Client:
 
         try:
             async with self.session.post(self.base_url, json=payload, headers=headers) as response:
+                text = await response.text()
+
+                print("STATUS:", response.status)
+                print("RAW RESPONSE:", text)
+
                 data = await response.json()
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                return content 
+
+                if "error" in data:
+                    print("API ERROR:", data["error"])
+                    return ""
+
+                return data.get("choices", [{}])[0].get("message", {}).get("content", "")
+
 
         except Exception as e:
-            return f"Error: {str(e)}"
+            print("REQUEST FAILED:", e)
+            return ""
