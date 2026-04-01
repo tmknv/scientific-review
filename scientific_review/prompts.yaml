@@ -69,7 +69,7 @@ baseline:
       },
       "final_score": number (1-10),
       "verdict": "accept/revise/reject",
-      "review": "cohesive, professional review text, 1–3 paragraphs"
+      "review": "a coherent, professional review text, 1-3 paragraphs, written in Russian"
     }
 
     Constraints:

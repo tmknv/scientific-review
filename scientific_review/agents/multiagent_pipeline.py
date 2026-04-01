@@ -52,17 +52,11 @@ class MultiAgentPipeline:
             workflow.add_node(name, agent.ainvoke)
             workflow.add_edge(START, name) 
 
-        # workflow.add_node("aggregator", aggregator)
         workflow.add_node("raw_review", self.raw_review_agent.ainvoke)
         workflow.add_node("final_review", self.final_review_agent.ainvoke)
 
-        # for agent_name in self.agents.keys():
-        #     workflow.add_edge(agent_name, "aggregator")
-
         for agent_name in self.agents.keys():
             workflow.add_edge(agent_name, "raw_review")
-
-        # workflow.add_edge("aggregator", "raw_review")
 
         workflow.add_edge("raw_review", "final_review")
 
