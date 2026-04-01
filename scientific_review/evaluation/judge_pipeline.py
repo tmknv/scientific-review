@@ -43,7 +43,9 @@ class JudgePipeline:
             "judge", 
             text=text, 
             baseline_review=baseline_result.get("review", ""), 
-            multiagent_review=multiagent_result.get("review", ""))
+            multiagent_review=multiagent_result.final_review
+        )
+
 
         messages = [{"role": "user", "content": prompt}]
 

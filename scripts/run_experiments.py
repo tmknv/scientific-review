@@ -28,9 +28,9 @@ async def run_experiments(texts: List[str], human_scores: Optional[List[List[flo
         human_scores: human оценки (опционально)
     """
 
-    async with Client(model=MODELS["baseline"]) as baseline_client, \
-               Client(model=MODELS["multiagent"]) as multiagent_client, \
-               Client(model=MODELS["judge"]) as judge_client:
+    async with Client() as baseline_client, \
+               Client() as multiagent_client, \
+               Client() as judge_client:
 
         baseline_pipeline = BaselinePipeline(baseline_client)
         multiagent_pipeline = MultiAgentPipeline(multiagent_client)

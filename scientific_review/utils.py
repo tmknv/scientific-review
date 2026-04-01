@@ -167,25 +167,49 @@ def state_to_dict(state: State) -> Dict[str, Any]:
     return data
 
 
-def extract_scores(result: Dict[str, Any]) -> List[float]:
+# def extract_scores(result: Dict[str, Any]) -> List[float]:
+#     """
+#     Извлекает оценки в фиксированном порядке.
+
+#     Args:
+#         result: Результат работы пайплайна в виде словаря
+
+#     Returns:
+#         Список оценок: [novelty, scientificity, readability, complexity]
+#     """
+#     scores = result.get("scores", {})
+
+#     return [
+#         scores.get("novelty", -1),
+#         scores.get("scientificity", -1),
+#         scores.get("readability", -1),
+#         scores.get("complexity", -1),
+#     ]
+def extract_scores(result: Union[Dict[str, Any], State]) -> List[float]:
     """
     Извлекает оценки в фиксированном порядке.
 
     Args:
-        result: Результат работы пайплайна в виде словаря
+        result: State или словарь с ключом "scores"
 
     Returns:
         Список оценок: [novelty, scientificity, readability, complexity]
     """
-    scores = result.get("scores", {})
+    # Получаем словарь оценок
+    if isinstance(result, State):
+        scores = result.scores
+    elif isinstance(result, dict):
+        scores = result.get("scores", {})
+    else:
+        raise TypeError(f"Unexpected result type: {type(result)}")
 
+    # Возвращаем список оценок в нужном порядке, -1 если отсутствует
     return [
         scores.get("novelty", -1),
         scores.get("scientificity", -1),
         scores.get("readability", -1),
         scores.get("complexity", -1),
     ]
-
 
 def serialize_messages(messages: List) -> List[Dict]:
     """
