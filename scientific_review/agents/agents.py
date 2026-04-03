@@ -9,6 +9,7 @@ from scientific_review.config import MODELS
 from scientific_review.utils import extract_json, build_prompt, serialize_messages
 from scientific_review.agents.state import State
 from langchain_core.messages import HumanMessage, AIMessage
+from scientific_review.logger import setup_logging, get_logger
 
 # для получения имен добавить отдельный метод с @property в BaseAgent
 # используйте return self.__name__ или чета такое 
@@ -32,6 +33,8 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 #ТИПИЗАЦИЯ !!!!! ДОКСТРИНГИ!!!!! ШАПКА!!!!!
 
+setup_logging()
+logger = get_logger(__name__)
 
 class BaseAgent(ABC):
     """
@@ -108,7 +111,9 @@ class NoveltyAgent(BaseAgent):
 
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('NoveltyAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('NoveltyAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:
@@ -146,7 +151,9 @@ class ScientificityAgent(BaseAgent):
 
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('ScientificityAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('ScientificityAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:
@@ -185,7 +192,9 @@ class ReadabilityAgent(BaseAgent):
         
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('ReadabilityAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('ReadabilityAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:
@@ -224,7 +233,9 @@ class ComplexityAgent(BaseAgent):
 
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('ComplexityAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('ComplexityAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:
@@ -264,7 +275,9 @@ class RawReviewAgent(BaseAgent):
 
         prompt = build_prompt(self.name, text=state.text, scores=scores, reasons=reasons)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('RawReviewAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('RawReviewAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:
@@ -297,7 +310,9 @@ class FinalReviewAgent(BaseAgent):
 
         prompt = build_prompt(self.name, text=state.text, draft_review=state.draft_review)
         state.messages.append(HumanMessage(content=prompt))
+        logger.info('FinalReviewAgent запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=MODELS['agent'])
+        logger.info('FinalReviewAgent отработал')
         try:
             data = extract_json(response)
         except Exception as e:

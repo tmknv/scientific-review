@@ -5,6 +5,10 @@ import aiohttp
 from typing import List, Dict
 
 from scientific_review.config import OPENROUTER_API_KEY
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 class Client:
@@ -58,21 +62,26 @@ class Client:
         }
 
         try:
+            logger.info(f"Отправка запроса в OpenRouter: модель={model}")
             async with self.session.post(self.base_url, json=payload, headers=headers) as response:
-                text = await response.text()
+                logger.info(f"Получен ответ от OpenRouter: модель={model}")
 
-                print("STATUS:", response.status)
-                print("RAW RESPONSE:", text)
+                # text = await response.text()
+
+                # print("STATUS:", response.status)
+                # print("RAW RESPONSE:", text)
 
                 data = await response.json()
 
+                # print("PARSED RESPONSE:", data)
+                
                 if "error" in data:
-                    print("API ERROR:", data["error"])
+                    logger.error(f"API ERROR: {response.status} - {data['error']}")
                     return ""
 
                 return data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
 
         except Exception as e:
-            print("REQUEST FAILED:", e)
+            logger.error(f"REQUEST FAILED: {e}")
             return ""

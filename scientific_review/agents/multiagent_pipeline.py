@@ -9,6 +9,10 @@ from scientific_review.client import Client
 from scientific_review.agents.state import State
 from scientific_review.agents.agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent, RawReviewAgent, FinalReviewAgent
 from scientific_review.utils import final_score
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 class MultiAgentPipeline:
@@ -75,7 +79,9 @@ class MultiAgentPipeline:
             State с результатами анализа всех агентов.
         """
         initial_state = State(text=text, messages=[SystemMessage(content=text)])
+        logger.info('MultiAgentPipeline запущен')
         final_state = await self.workflow.ainvoke(initial_state)
+        logger.info('MultiAgentPipeline завершен')
 
         if not isinstance(final_state, State):
             final_state = State(**final_state)

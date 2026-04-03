@@ -6,6 +6,10 @@ from typing import Dict, Any
 from scientific_review.client import Client
 from scientific_review.utils import build_prompt, extract_json
 from scientific_review.config import MODELS
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 class JudgePipeline:
@@ -48,8 +52,10 @@ class JudgePipeline:
 
 
         messages = [{"role": "user", "content": prompt}]
-
+        
+        logger.info("JudgePipeline: отправка запроса")
         response = await self.client.generate(messages, model=MODELS["judge"])
+        logger.info("JudgePipeline: получен ответ")
 
         data = extract_json(response)
 

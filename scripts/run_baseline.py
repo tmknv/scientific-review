@@ -6,6 +6,10 @@ import asyncio
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
 from scientific_review.utils import print_json, save_json
 from scientific_review.client import Client
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 async def main():
@@ -31,7 +35,7 @@ async def main():
 
     path = save_json(result, "runs/baseline")
 
-    print("Saved to:", path)
+    logger.info(f"Saved to: {path}")
 
 
 if __name__ == "__main__":

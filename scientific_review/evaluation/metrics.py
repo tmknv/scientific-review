@@ -4,6 +4,10 @@
 from typing import List
 import numpy as np
 from scipy.stats import spearmanr
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 def spearman_correlation(x: List[float], y: List[float]) -> float:
@@ -27,8 +31,11 @@ def spearman_correlation(x: List[float], y: List[float]) -> float:
 
     if len(x) < 2:
         return 0.0
-
-    corr, _ = spearmanr(x, y)
+    try:
+        corr, _ = spearmanr(x, y)
+    except Exception as e:
+        logger.error(f"Ошибка при вычислении корреляции Спирмена: {e}")
+        return 0.0
 
     # isnan возникает, если все значения в одном из списков одинаковы 
     # (нулевая дисперсия) => деление на ноль в формуле корреляции

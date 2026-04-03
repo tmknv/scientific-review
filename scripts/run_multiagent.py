@@ -5,6 +5,10 @@ import asyncio
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
 from scientific_review.utils import print_json, save_json
 from scientific_review.client import Client
+from scientific_review.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 async def main():
@@ -22,6 +26,7 @@ async def main():
     This paper proposes a novel machine learning approach for NLP tasks.
     """
     async with Client() as client:
+        logger.info("Клиент инициализирован")
         pipeline = MultiAgentPipeline(client=client)
         state = await pipeline.run(text)
 
@@ -36,7 +41,7 @@ async def main():
 
     path = save_json(result, "runs/multiagent")
 
-    print("Saved to:", path)
+    logger.info(f"Saved to: {path}")
 
 
 if __name__ == "__main__":
