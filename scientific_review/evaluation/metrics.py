@@ -4,7 +4,7 @@
 from typing import List
 import numpy as np
 from scipy.stats import spearmanr
-from scientific_review.logger import setup_logging, get_logger
+from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
 logger = get_logger(__name__)
@@ -33,6 +33,7 @@ def spearman_correlation(x: List[float], y: List[float]) -> float:
         return 0.0
     try:
         corr, _ = spearmanr(x, y)
+        
     except Exception as e:
         logger.error(f"Ошибка при вычислении корреляции Спирмена: {e}")
         return 0.0

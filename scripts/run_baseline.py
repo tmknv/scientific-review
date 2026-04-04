@@ -4,9 +4,9 @@
 import asyncio
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
-from scientific_review.utils import print_json, save_json
+from scientific_review.utils.utils import print_json, save_json
 from scientific_review.client import Client
-from scientific_review.logger import setup_logging, get_logger
+from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
 logger = get_logger(__name__)
@@ -21,7 +21,6 @@ async def main():
     2) вывод результата в консоль
     3) сохранение JSON артефакта в runs/baseline
     """
-    
     # текст статьи
     text = """
     This paper proposes a novel machine learning approach for NLP tasks.
@@ -35,7 +34,7 @@ async def main():
 
     path = save_json(result, "runs/baseline")
 
-    logger.info(f"Saved to: {path}")
+    logger.info(f"Сохранено в: {path}")
 
 
 if __name__ == "__main__":

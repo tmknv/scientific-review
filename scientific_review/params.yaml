@@ -1,0 +1,20 @@
+# scientific_review/params.yaml
+# параметры приложения
+
+models:
+  baseline: "nvidia/nemotron-3-nano-30b-a3b:free"
+  agent: "nvidia/nemotron-3-nano-30b-a3b:free"
+  judge: "nvidia/nemotron-3-nano-30b-a3b:free"
+
+openrouter:
+  base_url: "https://openrouter.ai/api/v1/chat/completions"
+  timeout: 60
+
+evaluation:
+  concurrency: 5
+  runs: 5
+
+paths:
+  evaluation_results: "runs/evaluation"
+  multiagent_results: "runs/multiagent"
+  baseline_results: "runs/baseline"

@@ -5,14 +5,13 @@ import asyncio
 from typing import List, Optional
 
 from scientific_review.client import Client
-from scientific_review.config import MODELS
-from scientific_review.utils import save_json
+from scientific_review.utils.utils import save_json
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
 from scientific_review.evaluation.judge_pipeline import JudgePipeline
 from scientific_review.evaluation.evaluator import evaluate_dataset, evaluate_stability
-from scientific_review.logger import setup_logging, get_logger
+from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
 logger = get_logger(__name__)
@@ -53,7 +52,7 @@ async def run_experiments(texts: List[str], human_scores: Optional[List[List[flo
         logger.info("Оценка на датасете завершена")
 
         dataset_path = save_json(dataset_result, "runs/evaluation")
-        logger.info(f"Dataset results saved to: {dataset_path}")
+        logger.info(f"Сохранено в: {dataset_path}")
 
         # stability evaluation 
         # stability_result = await evaluate_stability(

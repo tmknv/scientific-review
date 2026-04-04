@@ -26,6 +26,7 @@ def merge_dicts(old: Dict[str, Any], new: Dict[str, Any]) -> Dict[str, Any]:
     """
     return {**old, **new}
 
+
 @dataclass
 class State:
     """
@@ -60,7 +61,6 @@ class State:
             - ошибки
             - дополнительная диагностика
     """
-
     # вход
     text: Annotated[str, last_value] = ""
  
