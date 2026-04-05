@@ -56,15 +56,15 @@ class MultiAgentPipeline:
             workflow.add_node(name, agent.ainvoke)
             workflow.add_edge(START, name) 
 
-        workflow.add_node("raw_review", self.raw_review_agent.ainvoke)
-        workflow.add_node("final_review", self.final_review_agent.ainvoke)
+        workflow.add_node("RawReviewAgent", self.raw_review_agent.ainvoke)
+        workflow.add_node("FinalReviewAgent", self.final_review_agent.ainvoke)
 
         for agent_name in self.agents.keys():
-            workflow.add_edge(agent_name, "raw_review")
+            workflow.add_edge(agent_name, "RawReviewAgent")
 
-        workflow.add_edge("raw_review", "final_review")
+        workflow.add_edge("RawReviewAgent", "FinalReviewAgent")
 
-        workflow.add_edge("final_review", END)
+        workflow.add_edge("FinalReviewAgent", END)
 
         return workflow
 

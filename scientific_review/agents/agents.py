@@ -27,8 +27,8 @@ class BaseAgent(ABC):
         name (str): Имя агента
         client: Асинхронный клиент для взаимодействия с LLM
     """
-    def __init__(self, name, client):
-        self._name_ = name
+    def __init__(self,  client):
+        self._name = self.__class__.__name__
         self.client = client
 
     @property
@@ -39,7 +39,7 @@ class BaseAgent(ABC):
         Returns:
             str: Имя агента.
         """
-        return self._name_
+        return self._name
 
     @abstractmethod
     async def run(self, state: State) -> State:
@@ -107,8 +107,6 @@ class NoveltyAgent(BaseAgent):
         state.reasons["novelty"] - объяснение оценки
         state.agents_outputs["novelty"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name="novelty", client=client)
 
     async def run(self, state: State) -> State:
         prompt = build_prompt(self.name, text=state.text)
@@ -156,8 +154,6 @@ class ScientificityAgent(BaseAgent):
         state.reasons["scientificity"] - объяснение оценки
         state.agents_outputs["scientificity"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name="scientificity", client=client)
 
     async def run(self, state: State) -> State:
         prompt = build_prompt(self.name, text=state.text)
@@ -205,8 +201,6 @@ class ReadabilityAgent(BaseAgent):
         state.reasons["readability"] - объяснение оценки        
         state.agents_outputs["readability"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name="readability", client=client)
 
     async def run(self, state: State) -> State:    
         prompt = build_prompt(self.name, text=state.text)
@@ -254,8 +248,6 @@ class ComplexityAgent(BaseAgent):
         state.reasons["complexity"] - объяснение оценки
         state.agents_outputs["complexity"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name="complexity", client=client)
 
     async def run(self, state: State) -> State:
         prompt = build_prompt(self.name, text=state.text)
@@ -304,8 +296,6 @@ class RawReviewAgent(BaseAgent):
         state.draft_review - текст чернового ревью
         state.agents_outputs["raw_review"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name = 'raw_review_agent', client=client)
 
     async def run(self, state: State) -> State:
         scores = state.scores
@@ -356,8 +346,6 @@ class FinalReviewAgent(BaseAgent):
         state.verdict - "accept / minor revision / major revision / reject"
         state.agents_outputs["final_review"] - сохранение ответа агента
     """
-    def __init__(self, client):
-        super().__init__(name = 'final_review_agent', client=client)
 
     async def run(self, state: State) -> State:
         prompt = build_prompt(self.name, text=state.text, draft_review=state.draft_review)
@@ -387,3 +375,7 @@ class FinalReviewAgent(BaseAgent):
         state.verdict = verdict
 
         return state
+
+
+class CriticalAgent(BaseAgent):
+    ...

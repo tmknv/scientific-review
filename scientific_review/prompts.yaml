@@ -80,7 +80,7 @@ baseline:
     - Maintain consistency between scores, final_score, and verdict.
     - If the paper lacks sufficient information, assign lower scores and explain in the review.
 
-novelty:
+NoveltyAgent:
   system_prompt: |
     You are an expert academic reviewer specializing in evaluating the originality and novelty of research and written work.
     You are experienced in identifying new ideas, contributions, and distinctions from existing knowledge.
@@ -126,7 +126,7 @@ novelty:
     - Keep the explanation brief (1–3 sentences).
     - If the text lacks sufficient content to assess novelty, assign a low score and explain why.
 
-scientificity:
+ScientificityAgent:
   system_prompt: |
     You are an expert academic reviewer with deep experience in evaluating the scientific quality of research papers across disciplines. 
     You specialize in assessing rigor, methodology, evidence quality, and adherence to scientific standards.
@@ -168,7 +168,7 @@ scientificity:
     - Keep the explanation brief (1–3 sentences).
     - If the text lacks enough information to evaluate scientificity, assign a low score and explain why.
 
-readability:
+ReadabilityAgent:
   system_prompt: |
     You are an expert editor and linguist specializing in evaluating the readability of written texts.
     You have extensive experience in assessing clarity, structure, coherence, and accessibility for different audiences.
@@ -215,7 +215,7 @@ readability:
     - Keep the explanation brief (1–3 sentences).
     - If the text is too short or lacks enough information to assess readability, assign a low score and explain why.
 
-complexity:
+ComplexityAgent:
   system_prompt: |
     You are an expert analyst specializing in evaluating the intellectual and structural complexity of texts.
     You are skilled at identifying depth of reasoning, conceptual difficulty, and cognitive demands on the reader.
@@ -261,7 +261,7 @@ complexity:
     - Keep the explanation brief (1–3 sentences).
     - If the text is too simple or too short to assess complexity properly, assign a low score and explain why.
 
-raw_review_agent:
+RawReviewAgent:
   system_prompt: |
     You are an expert academic reviewer with extensive experience evaluating scientific and analytical texts across disciplines.
     Your expertise covers assessing originality, rigor, readability, and conceptual complexity.
@@ -305,7 +305,7 @@ raw_review_agent:
     - Ensure the narrative reflects the balance between the four dimensions.
     - If the paper lacks sufficient information, note this in the review.
 
-final_review_agent:
+FinalReviewAgent:
   system_prompt: |
     You are an expert scientific reviewer with extensive experience in evaluating academic and analytical texts.
     Your task is to produce a professional, coherent final review based on a draft review prepared by preliminary agents.
