@@ -15,6 +15,15 @@ evaluation:
   runs: 5
 
 paths:
-  evaluation_results: "runs/evaluation"
+  quality_results: "runs/quality"
+  stability_results: "runs/stability"
   multiagent_results: "runs/multiagent"
   baseline_results: "runs/baseline"
+  dataset: "data/processed/peerread.json"
+
+criteria:
+  order:
+    - novelty
+    - scientificity
+    - readability
+    - complexity

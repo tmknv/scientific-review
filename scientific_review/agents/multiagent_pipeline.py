@@ -3,14 +3,17 @@
 from langgraph.graph import START, StateGraph, END
 from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
 
+from scientific_review.utils.utils import final_score
+from scientific_review.utils.logger import setup_logging, get_logger
+from scientific_review.utils.params import get_params 
+
 from scientific_review.client import Client
 from scientific_review.agents.state import State
 from scientific_review.agents.agents import NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent, RawReviewAgent, FinalReviewAgent
-from scientific_review.utils.utils import final_score
-from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
 logger = get_logger(__name__)
+params = get_params()
 
 
 class MultiAgentPipeline:
@@ -88,6 +91,9 @@ class MultiAgentPipeline:
             final_state = State(**final_state)
         else:
             final_state = final_state
+
+        order = params["criteria"]["order"]
+        final_state.scores = {key: final_state.scores.get(key, -1) for key in order}
 
         final_state.scores["final_score"] = final_score(final_state)
 

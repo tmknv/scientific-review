@@ -375,7 +375,3 @@ class FinalReviewAgent(BaseAgent):
         state.verdict = verdict
 
         return state
-
-
-class CriticalAgent(BaseAgent):
-    ...
