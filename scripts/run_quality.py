@@ -46,8 +46,8 @@ async def run_quality(texts: List[str], human_scores: Optional[List[List[float]]
         logger.info("Начало оценки на датасете")
         dataset_result = await evaluate_dataset(
             texts=texts,
-            baseline_pipeline=baseline_pipeline,
             multiagent_pipeline=multiagent_pipeline,
+            baseline_pipeline=baseline_pipeline,
             judge_pipeline=judge_pipeline,
             human_scores_list=human_scores,
         )

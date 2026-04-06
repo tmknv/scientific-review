@@ -17,6 +17,7 @@ evaluation:
 paths:
   quality_results: "runs/quality"
   stability_results: "runs/stability"
+  ablation_results: "runs/ablation"
   multiagent_results: "runs/multiagent"
   baseline_results: "runs/baseline"
   dataset: "data/processed/peerread.json"

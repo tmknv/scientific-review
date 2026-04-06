@@ -19,8 +19,8 @@ logger = get_logger(__name__)
 # прогон одного текста
 async def evaluate_single(
     text: str,
-    baseline_pipeline: BaselinePipeline,
     multiagent_pipeline: MultiAgentPipeline,
+    baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores: Optional[List[float]] = None,
 ) -> Dict[str, Any]:
@@ -43,36 +43,39 @@ async def evaluate_single(
     """
     try:
         logger.debug("Запускаем пайплайны baseline и multiagent...")
-        baseline_task = asyncio.create_task(baseline_pipeline.run(text))
-        multiagent_task = asyncio.create_task(multiagent_pipeline.run(text))
+        tasks = []
+        if baseline_pipeline:
+            tasks.append(asyncio.create_task(baseline_pipeline.run(text)))
+        tasks.append(asyncio.create_task(multiagent_pipeline.run(text)))
 
-        baseline_result, multiagent_result = await asyncio.gather(baseline_task, multiagent_task)
-    except Exception as e:
-        logger.exception(f"Ошибка при выполнении пайплайнов baseline и multiagent: {e}")
-        return {
-            "error": str(e),
+        results = await asyncio.gather(*tasks)
+
+        result = {
             "baseline": None,
-            "multiagent": None,
+            "multiagent": None, 
             "metrics": {},
         }
 
-    baseline_scores = extract_scores(baseline_result)
-    multiagent_scores = extract_scores(multiagent_result)
-
-    logger.debug(f"Baseline scores: {baseline_scores}")
-    logger.debug(f"Multiagent scores: {multiagent_scores}")
+        if baseline_pipeline:
+            baseline_result = results[0]
+            baseline_scores = extract_scores(baseline_result)
+            result["baseline"] = baseline_result
+            logger.debug(f"Baseline scores: {baseline_scores}")
+        multiagent_result = results[1]
+        multiagent_scores = extract_scores(multiagent_result)
+        result["multiagent"] = multiagent_result
+        logger.debug(f"Multiagent scores: {multiagent_scores}")
+        
+    except Exception as e:
+        logger.exception(f"Ошибка при выполнении пайплайнов baseline и multiagent: {e}")
+        result["error"] = str(e)
+        return result
 
     logger.info("Считаем метрики...")
-    metrics = {}
     if human_scores is not None:
-        metrics["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
-        metrics["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
-
-    result = {
-        "baseline": baseline_result,
-        "multiagent": multiagent_result,
-        "metrics": metrics,
-    }
+        if baseline_pipeline:
+            result["metrics"]["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
+        result["metrics"]["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
 
     if judge_pipeline:
         try:
@@ -89,8 +92,8 @@ async def evaluate_single(
 # прогон датасета
 async def evaluate_dataset(
     texts: List[str],
-    baseline_pipeline: BaselinePipeline,
     multiagent_pipeline: MultiAgentPipeline,
+    baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores_list: Optional[List[List[float]]] = None,
     concurrency: int = 5,
@@ -102,8 +105,8 @@ async def evaluate_dataset(
 
     Args:
         texts: Список текстов
-        baseline_pipeline: Пайплайн для baseline
         multiagent_pipeline: Пайплайн для multi-agent
+        baseline_pipeline: Пайплайн для baseline (опционально для ablation)
         judge_pipeline: Пайплайн для judge (опционально)
         human_scores_list: Список human-оценок (опционально)
         concurrency: Ограничение параллелизма для semaphore
@@ -124,7 +127,7 @@ async def evaluate_dataset(
                 human_scores = human_scores_list[index]
 
             # считаем метрики для одного текста
-            return await evaluate_single(text, baseline_pipeline, multiagent_pipeline, judge_pipeline, human_scores)
+            return await evaluate_single(text, multiagent_pipeline, baseline_pipeline, judge_pipeline, human_scores)
     
     tasks = [asyncio.create_task(sem_task(i, text)) for i, text in enumerate(texts)]
 

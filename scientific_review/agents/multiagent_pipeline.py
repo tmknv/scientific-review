@@ -27,18 +27,26 @@ class MultiAgentPipeline:
     returns:
         State с результатами анализа всех агентов
     """
-    def __init__(self, client: Client = None):
+    def __init__(self, client: Client = None, enabled_agents=None):
         if client is None:
             client = Client()
+
+        if enabled_agents is None:
+            enabled_agents = params["criteria"]["order"]
         
         self.client = client
+
         agents_list = [
             NoveltyAgent(client),
             ScientificityAgent(client),
             ReadabilityAgent(client),
             ComplexityAgent(client),
         ]
-        self.agents = {agent.name: agent for agent in agents_list}
+
+        self.agents = {
+            agent.name: agent for agent in agents_list
+            if agent.name in enabled_agents
+        }
 
         self.raw_review_agent = RawReviewAgent(client)
         self.final_review_agent = FinalReviewAgent(client)
