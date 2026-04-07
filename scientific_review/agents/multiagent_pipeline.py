@@ -32,7 +32,7 @@ class MultiAgentPipeline:
             client = Client()
 
         if enabled_agents is None:
-            enabled_agents = params["criteria"]["order"]
+            enabled_agents = params["criteria"]["names"]
         
         self.client = client
 
