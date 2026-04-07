@@ -26,14 +26,14 @@ def get_ablation_configs() -> Dict[str, List[str]]:
 
     Example:
         {        
-            "full": ["novelty", "scientificity", "readability", "complexity"],
-            "no_novelty": ["scientificity", "readability", "complexity"],
-            "no_scientificity": ["novelty", "readability", "complexity"],
-            "no_readability": ["novelty", "scientificity", "complexity"],
-            "no_complexity": ["novelty", "scientificity", "readability"],
+            "full": ["NoveltyAgent", "ScientificityAgent", "ReadabilityAgent", "ComplexityAgent"],
+            "no_NoveltyAgent": ["ScientificityAgent", "ReadabilityAgent", "ComplexityAgent"],
+            "no_ScientificityAgent": ["NoveltyAgent", "ReadabilityAgent", "ComplexityAgent"],
+            "no_ReadabilityAgent": ["NoveltyAgent", "ScientificityAgent", "ComplexityAgent"],
+            "no_ComplexityAgent": ["NoveltyAgent", "ScientificityAgent", "ReadabilityAgent"],
         }
     """
-    full = params["criteria"]["order"]
+    full = params["criteria"]["names"]
 
     configs = {
         "full": full,

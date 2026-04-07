@@ -11,8 +11,8 @@ openrouter:
   timeout: 60
 
 evaluation:
-  concurrency: 5
-  runs: 5
+  concurrency: 1 # количество параллельных запросов
+  runs: 5 # количество прогонов статьи для оценки stability
 
 paths:
   quality_results: "runs/quality"
@@ -23,8 +23,14 @@ paths:
   dataset: "data/processed/peerread.json"
 
 criteria:
-  order:
+  order: # порядок критериев
     - novelty
     - scientificity
     - readability
     - complexity
+  
+  names: # имена критериальных агентов
+    - NoveltyAgent
+    - ScientificityAgent
+    - ReadabilityAgent
+    - ComplexityAgent

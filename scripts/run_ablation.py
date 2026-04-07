@@ -40,6 +40,11 @@ async def main():
     path = params["paths"]["dataset"]
 
     texts, human_scores = load_dataset(path)
+
+    # для теста берем 10 статей
+    texts = texts[:10]
+    human_scores = human_scores[:10] if human_scores is not None else None
+
     logger.info(f"Загружено текстов: {len(texts)}")
 
     await run_ablation(texts=texts, human_scores=human_scores)
