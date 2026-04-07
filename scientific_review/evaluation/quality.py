@@ -7,6 +7,7 @@ from typing import List, Dict, Any, Optional
 from scientific_review.utils.utils import extract_scores
 from scientific_review.evaluation.metrics import spearman_correlation
 from scientific_review.utils.logger import setup_logging, get_logger
+from scientific_review.utils.params import get_params
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
@@ -14,7 +15,7 @@ from scientific_review.evaluation.judge_pipeline import JudgePipeline
 
 setup_logging()
 logger = get_logger(__name__)
-
+params = get_params()
 
 # прогон одного текста
 async def evaluate_single(
@@ -61,7 +62,11 @@ async def evaluate_single(
             baseline_scores = extract_scores(baseline_result)
             result["baseline"] = baseline_result
             logger.debug(f"Baseline scores: {baseline_scores}")
-        multiagent_result = results[1]
+            multiagent_result = results[1]
+        else:
+            baseline_result = None
+            baseline_scores = None
+            multiagent_result = results[0]
         multiagent_scores = extract_scores(multiagent_result)
         result["multiagent"] = multiagent_result
         logger.debug(f"Multiagent scores: {multiagent_scores}")
@@ -96,7 +101,7 @@ async def evaluate_dataset(
     baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores_list: Optional[List[List[float]]] = None,
-    concurrency: int = 5,
+    concurrency: int = params["evaluation"]["concurrency"],
 ) -> Dict[str, Any]:
     """
     Оценка датасета. 

@@ -45,7 +45,11 @@ def get_ablation_configs() -> Dict[str, List[str]]:
     return configs
 
 
-async def evaluate_ablation(texts: List[str], human_scores: List[List[float]], concurrency: int = 5) -> Dict[str, Any]:
+async def evaluate_ablation(
+        texts: List[str], 
+        human_scores: List[List[float]], 
+        concurrency: int = params["evaluation"]["concurrency"]
+) -> Dict[str, Any]:
     """
     Запускает ablation study: убираем агентов и смотрим деградацию.
 
@@ -59,7 +63,7 @@ async def evaluate_ablation(texts: List[str], human_scores: List[List[float]], c
     Returns:
         Словарь: configuration_name -> результат evaluate_dataset для каждой конфигурации
     """
-    logger.info("Запуск ablation study...")
+    logger.info("Запуск ablation study (concurrency={concurrency})...")
 
     configs = get_ablation_configs()
     results = {}

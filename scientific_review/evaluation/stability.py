@@ -7,12 +7,14 @@ from typing import Dict, Any
 from scientific_review.utils.utils import extract_scores
 from scientific_review.evaluation.metrics import inter_run_variance
 from scientific_review.utils.logger import setup_logging, get_logger
+from scientific_review.utils.params import get_params
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
 from scientific_review.agents.multiagent_pipeline import MultiAgentPipeline
 
 setup_logging() 
 logger = get_logger(__name__)
+params = get_params()
 
 
 async def evaluate_stability(
@@ -20,7 +22,7 @@ async def evaluate_stability(
     baseline_pipeline: BaselinePipeline, 
     multiagent_pipeline: MultiAgentPipeline, 
     runs: int = 5, 
-    concurrency: int = 5
+    concurrency: int = params["evaluation"]["concurrency"]
 ) -> Dict[str, Any]:
     """
     Stability test
@@ -41,7 +43,8 @@ async def evaluate_stability(
     """
     logger.info(f"Запуск теста стабильности (runs={runs}, concurrency={concurrency})...")
 
-    concurrency = min(concurrency, runs)
+    # concurrency не может быть больше количества прогонов
+    concurrency = min(concurrency, runs) 
     semaphore = asyncio.Semaphore(concurrency)
 
     async def sem_run_baseline():
