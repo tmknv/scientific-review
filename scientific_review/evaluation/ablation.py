@@ -82,7 +82,7 @@ async def evaluate_ablation(
                 texts=texts,
                 multiagent_pipeline=multiagent_pipeline,
                 human_scores_list=human_scores,
-                concurrency=concurrency,
+                concurrency=1,
             )
 
             results[name] = dataset_result
