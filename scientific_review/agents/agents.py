@@ -64,7 +64,7 @@ class BaseAgent(ABC):
         Returns:
             State: Обновленный state 
         """
-        return await self.run(state)
+        return await self.analyze(state)
     
     async def analyze(self, state: State) -> State:
         """
@@ -79,14 +79,17 @@ class BaseAgent(ABC):
         start_time = time.time()
         try:
             state = await self.run(state)
+            state.metadata[f"{self.name}_success"] = True
 
         except Exception as e:
-            state["metadata"][f"{self.name}_error"] = str(e)
-            state["metadata"][f"{self.name}_trace"] = traceback.format_exc()
+            state.metadata[f"{self.name}_error"] = str(e)
+            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
+            state.metadata[f"{self.name}_success"] = False
+            logger.error(f"{self.name} failed: {e}", exc_info=True)
             raise
 
         finally:
-            state["metadata"][f"{self.name}_time"] = time.time() - start_time
+            state.metadata[f"{self.name}_time"] = time.time() - start_time
 
         return state
 
@@ -112,21 +115,16 @@ class NoveltyAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('NoveltyAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('NoveltyAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
-        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
 
         state.agents_outputs[self.name] = {
             "score": score,
@@ -159,21 +157,16 @@ class ScientificityAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('ScientificityAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('ScientificityAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
-        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
         
         state.agents_outputs[self.name] = {
             "score": score,
@@ -206,21 +199,16 @@ class ReadabilityAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('ReadabilityAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('ReadabilityAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)   
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
-        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
         
         state.agents_outputs[self.name] = {
             "score": score,
@@ -253,21 +241,16 @@ class ComplexityAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('ComplexityAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('ComplexityAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)   
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
-        state.messages.append(AIMessage(content=f"{self.name}: score={score}, reason={reason}"))
+        state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
         
         state.agents_outputs[self.name] = {
             "score": score,
@@ -304,19 +287,14 @@ class RawReviewAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text, scores=scores, reasons=reasons)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('RawReviewAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('RawReviewAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)   
 
         review = data.get("Review", response)
-        state.messages.append(AIMessage(content=f"{self.name}: raw_review={review}"))
+        state.messages.append(AIMessage(content=review, name=self.name))
         
         state.agents_outputs[self.name] = {
             "draft_review": review
@@ -351,20 +329,15 @@ class FinalReviewAgent(BaseAgent):
         prompt = build_prompt(self.name, text=state.text, draft_review=state.draft_review)
         state.messages.append(HumanMessage(content=prompt))
 
-        logger.info('FinalReviewAgent запрос отправлен')
+        logger.info(f'{self.name} запрос отправлен')
         response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info('FinalReviewAgent отработал')
+        logger.info(f'{self.name} отработал')
 
-        try:
-            data = extract_json(response)
-        except Exception as e:
-            state.metadata[f"{self.name}_error"] = str(e)
-            state.metadata[f"{self.name}_trace"] = traceback.format_exc()
-            raise
+        data = extract_json(response)   
 
         final_review = data.get("final_review", response)
         verdict = data.get("verdict", "undecided")
-        state.messages.append(AIMessage(content=f"{self.name}: final_review={final_review}, verdict={verdict}"))
+        state.messages.append(AIMessage(content=f"{final_review}\n\nВердикт: {verdict}", name=self.name))
 
         state.agents_outputs[self.name] = {
             "final_review": final_review,
@@ -375,7 +348,3 @@ class FinalReviewAgent(BaseAgent):
         state.verdict = verdict
 
         return state
-
-
-class CriticalAgent(BaseAgent):
-    ...

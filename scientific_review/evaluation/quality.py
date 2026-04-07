@@ -1,11 +1,11 @@
-# scientific_review/evaluation/evaluator.py
-# асинхронный evaluator: baseline vs multi-agent + human + judge + stability
+# scientific_review/evaluation/quality.py
+# оценка качества: baseline vs multi-agent (human labels + judge)
 
 import asyncio
 from typing import List, Dict, Any, Optional
 
 from scientific_review.utils.utils import extract_scores
-from scientific_review.evaluation.metrics import spearman_correlation, inter_run_variance
+from scientific_review.evaluation.metrics import spearman_correlation
 from scientific_review.utils.logger import setup_logging, get_logger
 
 from scientific_review.baseline.baseline_pipeline import BaselinePipeline
@@ -19,8 +19,8 @@ logger = get_logger(__name__)
 # прогон одного текста
 async def evaluate_single(
     text: str,
-    baseline_pipeline: BaselinePipeline,
     multiagent_pipeline: MultiAgentPipeline,
+    baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores: Optional[List[float]] = None,
 ) -> Dict[str, Any]:
@@ -30,7 +30,6 @@ async def evaluate_single(
     Считает:
     - baseline_scores vs human_scores
     - multiagent_scores vs human_scores
-    - baseline_scores vs multiagent_scores
 
     Args:
         text: Текст статьи
@@ -44,31 +43,39 @@ async def evaluate_single(
     """
     try:
         logger.debug("Запускаем пайплайны baseline и multiagent...")
-        baseline_task = asyncio.create_task(baseline_pipeline.run(text))
-        multiagent_task = asyncio.create_task(multiagent_pipeline.run(text))
+        tasks = []
+        if baseline_pipeline:
+            tasks.append(asyncio.create_task(baseline_pipeline.run(text)))
+        tasks.append(asyncio.create_task(multiagent_pipeline.run(text)))
 
-        baseline_result, multiagent_result = await asyncio.gather(baseline_task, multiagent_task)
+        results = await asyncio.gather(*tasks)
+
+        result = {
+            "baseline": None,
+            "multiagent": None, 
+            "metrics": {},
+        }
+
+        if baseline_pipeline:
+            baseline_result = results[0]
+            baseline_scores = extract_scores(baseline_result)
+            result["baseline"] = baseline_result
+            logger.debug(f"Baseline scores: {baseline_scores}")
+        multiagent_result = results[1]
+        multiagent_scores = extract_scores(multiagent_result)
+        result["multiagent"] = multiagent_result
+        logger.debug(f"Multiagent scores: {multiagent_scores}")
+        
     except Exception as e:
         logger.exception(f"Ошибка при выполнении пайплайнов baseline и multiagent: {e}")
-        return {}
-
-    baseline_scores = extract_scores(baseline_result)
-    multiagent_scores = extract_scores(multiagent_result)
-
-    logger.debug(f"Baseline scores: {baseline_scores}")
-    logger.debug(f"Multiagent scores: {multiagent_scores}")
+        result["error"] = str(e)
+        return result
 
     logger.info("Считаем метрики...")
-    metrics = {}
     if human_scores is not None:
-        metrics["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
-        metrics["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
-
-    result = {
-        "baseline": baseline_result,
-        "multiagent": multiagent_result,
-        "metrics": metrics,
-    }
+        if baseline_pipeline:
+            result["metrics"]["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
+        result["metrics"]["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
 
     if judge_pipeline:
         try:
@@ -85,8 +92,8 @@ async def evaluate_single(
 # прогон датасета
 async def evaluate_dataset(
     texts: List[str],
-    baseline_pipeline: BaselinePipeline,
     multiagent_pipeline: MultiAgentPipeline,
+    baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores_list: Optional[List[List[float]]] = None,
     concurrency: int = 5,
@@ -98,11 +105,10 @@ async def evaluate_dataset(
 
     Args:
         texts: Список текстов
-        baseline_pipeline: Пайплайн для baseline
         multiagent_pipeline: Пайплайн для multi-agent
+        baseline_pipeline: Пайплайн для baseline (опционально для ablation)
         judge_pipeline: Пайплайн для judge (опционально)
         human_scores_list: Список human-оценок (опционально)
-        save_path: Путь для сохранения
         concurrency: Ограничение параллелизма для semaphore
 
     Returns:
@@ -121,7 +127,7 @@ async def evaluate_dataset(
                 human_scores = human_scores_list[index]
 
             # считаем метрики для одного текста
-            return await evaluate_single(text, baseline_pipeline, multiagent_pipeline, judge_pipeline, human_scores)
+            return await evaluate_single(text, multiagent_pipeline, baseline_pipeline, judge_pipeline, human_scores)
     
     tasks = [asyncio.create_task(sem_task(i, text)) for i, text in enumerate(texts)]
 
@@ -146,66 +152,3 @@ async def evaluate_dataset(
 
     logger.info(f"Оценка датасета завершена.")
     return final
-
-
-# stability
-async def evaluate_stability(
-    text: str, 
-    baseline_pipeline: BaselinePipeline, 
-    multiagent_pipeline: MultiAgentPipeline, 
-    runs: int = 5, 
-    concurrency: int = 5
-) -> Dict[str, Any]:
-    """
-    Stability test
-    Считает дисперсию по нескольким прогонам одной статьи.
-
-    baseline run1, run2, run3... -> baseline_var  
-    multiagent run1, run2, run3... -> multiagent_var
-
-    Args:
-        text: Текст статьи
-        baseline_pipeline: Пайплайн для baseline
-        multiagent_pipeline: Пайплайн для multi-agent
-        runs: Количество прогонов
-        concurrency: Ограничение параллелизма для semaphore
-
-    Returns:
-        Variance для baseline и multi-agent
-    """
-    logger.info(f"Запуск теста стабильности (runs={runs}, concurrency={concurrency})...")
-
-    semaphore = asyncio.Semaphore(concurrency)
-
-    async def sem_run_baseline():
-        async with semaphore:
-            return await baseline_pipeline.run(text)
-
-    async def sem_run_multiagent():
-        async with semaphore:
-            return await multiagent_pipeline.run(text)
-
-    baseline_tasks = [asyncio.create_task(sem_run_baseline()) for _ in range(runs)]
-    multiagent_tasks = [asyncio.create_task(sem_run_multiagent()) for _ in range(runs)]
-
-    baseline_results = await asyncio.gather(*baseline_tasks)
-    multiagent_results = await asyncio.gather(*multiagent_tasks)
-
-    baseline_runs = [extract_scores(result) for result in baseline_results]
-    multiagent_runs = [extract_scores(result) for result in multiagent_results]
-
-    baseline_var = inter_run_variance(baseline_runs)
-    multiagent_var = inter_run_variance(multiagent_runs)
-
-    logger.info(f"Оценка стабильности завершена.")
-
-    return {
-        "baseline": {
-            "runs": baseline_runs,
-            "variance": baseline_var,
-        },
-        "multiagent": {
-            "runs": multiagent_runs,
-            "variance": multiagent_var,
-        },
-    }

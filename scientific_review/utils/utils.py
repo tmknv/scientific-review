@@ -5,11 +5,16 @@ import json
 import re
 import os
 from datetime import datetime
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, Union, List, Tuple
+from functools import lru_cache
+
+from scientific_review.utils.params import get_params
 
 from scientific_review.agents.state import State
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
-    
+
+params = get_params()
+
 
 def extract_json(text: str) -> Dict[str, Any]:
     """
@@ -185,13 +190,9 @@ def extract_scores(result: Union[Dict[str, Any], State]) -> List[float]:
     else:
         raise TypeError(f"Unexpected result type: {type(result)}")
 
+    order = params["criteria"]["order"]
     # возвращаем список оценок в нужном порядке, -1 если отсутствует
-    return [
-        scores.get("novelty", -1),
-        scores.get("scientificity", -1),
-        scores.get("readability", -1),
-        scores.get("complexity", -1),
-    ]
+    return [scores.get(key, -1) for key in order]
 
 
 def serialize_messages(messages: List) -> List[Dict]:
@@ -222,3 +223,34 @@ def serialize_messages(messages: List) -> List[Dict]:
         })
     
     return serialized
+
+
+@lru_cache()
+def load_dataset(path: str) -> Tuple[List[str], List[List[float]]]:
+    """
+    Загружает датасет PeerRead.
+
+    Args:    
+        path: Путь к файлу с датасетом
+
+    Returns:
+        texts: Список текстов из датасета
+        human_scores: Список списков human-оценок для каждого текста
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    texts = []
+    human_scores = []
+    order = params["criteria"]["order"]
+
+    for item in data:
+        texts.append(item["text"])
+
+        scores = item["scores"]
+
+        human_scores.append([
+            float(scores.get(key, -1)) for key in order
+        ])
+
+    return texts, human_scores

@@ -51,15 +51,13 @@ class BaselinePipeline:
         data = extract_json(response)
 
         scores = data.get("scores", {})
+        order = params["criteria"]["order"]
+
+        ordered_scores = {key: scores.get(key, -1) for key in order}
+        ordered_scores["final_score"] = data.get("final_score", -1)
 
         return {
-            "scores": {
-                "novelty": scores.get("novelty", -1),
-                "scientificity": scores.get("scientificity", -1),
-                "readability": scores.get("readability", -1),
-                "complexity": scores.get("complexity", -1),
-                "final_score": data.get("final_score", -1),
-            },
+            "scores": ordered_scores,
             "verdict": data.get("verdict", "unknown"),
             "review": data.get("review", response),
             "raw_output": response,
