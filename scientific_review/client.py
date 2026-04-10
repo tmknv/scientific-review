@@ -44,7 +44,7 @@ class Client:
             await self.session.close()
             self.session = None
 
-    async def generate(self, messages: List[Dict], model: str) -> str:
+    async def generate(self, messages: List[Dict], model: str, temperature: float = 0.4) -> str:
         """
         Асинхронно отправляет запрос в OpenRouter и возвращает результат.
 
@@ -62,6 +62,7 @@ class Client:
         payload = {
             "model": model,
             "messages": messages,
+            "temperature": temperature
         }
 
         try:

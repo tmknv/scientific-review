@@ -50,7 +50,6 @@ class MultiAgentPipeline:
 
         self.raw_review_agent = RawReviewAgent(client)
         self.final_review_agent = FinalReviewAgent(client)
-
         self.workflow = self.build_workflow().compile()
 
     def build_workflow(self) -> StateGraph:
@@ -89,7 +88,7 @@ class MultiAgentPipeline:
         Returns:
             State с результатами анализа всех агентов
         """
-        initial_state = State(text=text, messages=[SystemMessage(content=text)])
+        initial_state = State(text=text, messages=[SystemMessage(content=f'text: {text}')])
         logger.info('MultiAgentPipeline запущен')
         
         final_state = await self.workflow.ainvoke(initial_state)

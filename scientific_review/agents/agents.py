@@ -7,11 +7,11 @@ import traceback
 
 from scientific_review.utils.utils import extract_json, serialize_messages
 from scientific_review.utils.params import get_params
-from scientific_review.utils.prompts import build_prompt
+from scientific_review.utils.prompts import get_prompt_parts
 from scientific_review.utils.logger import setup_logging, get_logger
-
 from scientific_review.agents.state import State
-from langchain_core.messages import HumanMessage, AIMessage
+
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 setup_logging()
 logger = get_logger(__name__)
@@ -40,6 +40,46 @@ class BaseAgent(ABC):
             str: Имя агента.
         """
         return self._name
+    
+    def build_messages(self, state: State, **kwargs)-> list[SystemMessage | HumanMessage]:
+        """
+        Строит список сообщений для запроса к модели.
+
+        Args:
+            state: Входной state для агента
+            **kwargs: Дополнительные параметры для заполнения промта
+        
+        Returns:
+            list[SystemMessage | HumanMessage]: Список сообщений для модели
+        """
+
+        system_prompt, user_prompt = get_prompt_parts(self.name, **kwargs)
+        return [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=f"Текст статьи:\n{state.text}\n\n{user_prompt}")
+        ]
+    
+    async def request_model(self, state: State, **kwargs) -> str:
+        """
+        Строит промт для агента, отрпавляет запрос к модели и возвращает ответ.
+
+        Args:
+            state: Входной state для агента
+            **kwargs: Дополнительные параметры для заполнения промта
+        
+        Returns:
+            str: Ответ модели
+        """
+        messages = self.build_messages(state, **kwargs)
+
+        logger.info(f"{self.name} запрос отправлен")
+        response = await self.client.generate(
+            serialize_messages(messages),
+            model=params["models"]["agent"],
+        )
+        logger.info(f"{self.name} отработал")
+        return response
+    
 
     @abstractmethod
     async def run(self, state: State) -> State:
@@ -92,6 +132,8 @@ class BaseAgent(ABC):
             state.metadata[f"{self.name}_time"] = time.time() - start_time
 
         return state
+    
+
 
 
 class NoveltyAgent(BaseAgent):
@@ -112,12 +154,8 @@ class NoveltyAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:
-        prompt = build_prompt(self.name, text=state.text)
-        state.messages.append(HumanMessage(content=prompt))
 
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
+        response = await self.request_model(state)
 
         data = extract_json(response)
 
@@ -125,7 +163,6 @@ class NoveltyAgent(BaseAgent):
         reason = data.get("reason", "")
 
         state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
-
         state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
@@ -154,13 +191,8 @@ class ScientificityAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:
-        prompt = build_prompt(self.name, text=state.text)
-        state.messages.append(HumanMessage(content=prompt))
 
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
-
+        response = await self.request_model(state)
         data = extract_json(response)
 
         score = data.get("score", -1)
@@ -196,20 +228,14 @@ class ReadabilityAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:    
-        prompt = build_prompt(self.name, text=state.text)
-        state.messages.append(HumanMessage(content=prompt))
 
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
-
-        data = extract_json(response)   
+        response = await self.request_model(state)
+        data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
         state.messages.append(AIMessage(content=f"score={score}, reason={reason}", name=self.name))
-        
         state.agents_outputs[self.name] = {
             "score": score,
             "reason": reason
@@ -238,14 +264,9 @@ class ComplexityAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:
-        prompt = build_prompt(self.name, text=state.text)
-        state.messages.append(HumanMessage(content=prompt))
 
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
-
-        data = extract_json(response)   
+        response = await self.request_model(state)
+        data = extract_json(response)
 
         score = data.get("score", -1)
         reason = data.get("reason", "")
@@ -281,21 +302,17 @@ class RawReviewAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:
-        scores = state.scores
-        reasons = state.reasons
 
-        prompt = build_prompt(self.name, text=state.text, scores=scores, reasons=reasons)
-        state.messages.append(HumanMessage(content=prompt))
-
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
-
-        data = extract_json(response)   
+        response = await self.request_model(
+            state,
+            scores=state.scores,
+            reasons=state.reasons,
+        )
+        data = extract_json(response)
 
         review = data.get("Review", response)
+
         state.messages.append(AIMessage(content=review, name=self.name))
-        
         state.agents_outputs[self.name] = {
             "draft_review": review
         }
@@ -326,24 +343,21 @@ class FinalReviewAgent(BaseAgent):
     """
 
     async def run(self, state: State) -> State:
-        prompt = build_prompt(self.name, text=state.text, draft_review=state.draft_review)
-        state.messages.append(HumanMessage(content=prompt))
 
-        logger.info(f'{self.name} запрос отправлен')
-        response = await self.client.generate(serialize_messages(state.messages), model=params["models"]["agent"])
-        logger.info(f'{self.name} отработал')
-
-        data = extract_json(response)   
+        response = await self.request_model(state, draft_review=state.draft_review)
+        data = extract_json(response)
 
         final_review = data.get("final_review", response)
         verdict = data.get("verdict", "undecided")
-        state.messages.append(AIMessage(content=f"{final_review}\n\nВердикт: {verdict}", name=self.name))
 
+        state.messages.append(
+            AIMessage(content=f"{final_review}\n\nВердикт: {verdict}", name=self.name)
+        )
         state.agents_outputs[self.name] = {
             "final_review": final_review,
             "verdict": verdict
         }
-
+        
         state.final_review = final_review
         state.verdict = verdict
 

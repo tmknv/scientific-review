@@ -2,9 +2,9 @@
 # параметры приложения
 
 models:
-  baseline: "nvidia/nemotron-3-nano-30b-a3b:free"
+  baseline: "openai/gpt-oss-120b:free"
   agent: "nvidia/nemotron-3-nano-30b-a3b:free"
-  judge: "nvidia/nemotron-3-nano-30b-a3b:free"
+  judge: "openai/gpt-oss-120b:free"
 
 openrouter:
   base_url: "https://openrouter.ai/api/v1/chat/completions"
