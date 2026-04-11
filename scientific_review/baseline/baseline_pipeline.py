@@ -6,7 +6,7 @@ from typing import Dict, Any
 from scientific_review.client import Client
 from scientific_review.utils.utils import extract_json
 from scientific_review.utils.params import get_params
-from scientific_review.utils.prompts import build_prompt
+from scientific_review.utils.prompts import get_prompt_parts
 from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
@@ -41,8 +41,11 @@ class BaselinePipeline:
         Returns:
             Результат baseline (scores, verdict, review, raw_output)
         """
-        prompt = build_prompt("baseline", text=text)
-        messages = [{"role": "user", "content": prompt}]
+        system_prompt, user_prompt = get_prompt_parts(self.name, text=text)
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
 
         logger.info("BaselinePipeline: отправка запроса")
         response = await self.client.generate(messages=messages, model=params["models"]["baseline"])
