@@ -1,6 +1,7 @@
 # scientific_review/client.py
 # Асинхронный клиент OpenRouter для всех агентов и baseline
 
+import asyncio
 import aiohttp
 from typing import List, Dict
 
@@ -28,10 +29,12 @@ class Client:
         self,
         base_url: str = params["openrouter"]["base_url"],
         timeout: int = params["openrouter"]["timeout"],
+        semaphore: asyncio.Semaphore = asyncio.Semaphore(3),
     ):
         self.api_key = settings.OPENROUTER_API_KEY
         self.base_url = base_url
         self.timeout = aiohttp.ClientTimeout(total=timeout)
+        self.semaphore = semaphore
         self.session: aiohttp.ClientSession | None = None
 
     # для async with Client() as client
@@ -67,33 +70,33 @@ class Client:
 
         try:
             logger.debug(f"Отправка запроса в OpenRouter | model={model}")
+            async with self.semaphore:
+                async with self.session.post(self.base_url, json=payload, headers=headers) as response:
+                    text = await response.text()
+                    status = response.status
 
-            async with self.session.post(self.base_url, json=payload, headers=headers) as response:
-                text = await response.text()
-                status = response.status
+                    logger.debug(f"Response status: {status}")
 
-                logger.debug(f"Response status: {status}")
+                    if status != 200:
+                        logger.error(f"HTTP ERROR {status}: {text}")
+                        return ""
 
-                if status != 200:
-                    logger.error(f"HTTP ERROR {status}: {text}")
-                    return ""
+                    try:
+                        data = await response.json()
+                    except Exception:
+                        logger.error(f"Не удалось распарсить JSON. Raw response: {text}")
+                        return ""
 
-                try:
-                    data = await response.json()
-                except Exception:
-                    logger.error(f"Не удалось распарсить JSON. Raw response: {text}")
-                    return ""
+                    if "error" in data:
+                        logger.error(f"OpenRouter API error: {data['error']}")
+                        return ""
 
-                if "error" in data:
-                    logger.error(f"OpenRouter API error: {data['error']}")
-                    return ""
+                    content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                    
+                    if not content:
+                        logger.warning(f"Пустой ответ от модели. Raw: {data}")
 
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                
-                if not content:
-                    logger.warning(f"Пустой ответ от модели. Raw: {data}")
-
-                return content
+                    return content
 
         except aiohttp.ClientError as e:
             logger.error(f"Запрос не удался (ClientError): {e}")

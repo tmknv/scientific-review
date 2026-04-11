@@ -231,7 +231,7 @@ class ReadabilityAgent(BaseAgent):
 
         response = await self.request_model(state)
         data = extract_json(response)
-
+        
         score = data.get("score", -1)
         reason = data.get("reason", "")
 
@@ -357,7 +357,7 @@ class FinalReviewAgent(BaseAgent):
             "final_review": final_review,
             "verdict": verdict
         }
-        
+
         state.final_review = final_review
         state.verdict = verdict
 

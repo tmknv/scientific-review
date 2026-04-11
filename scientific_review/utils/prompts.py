@@ -8,7 +8,7 @@ from functools import lru_cache
 from typing import Dict, Any
 
 
-# @lru_cache()
+@lru_cache()
 def get_prompts(path: str = "scientific_review/prompts.yaml") -> Dict[str, Any]:
     """
     Загружает prompts.yaml (кэшируется)
