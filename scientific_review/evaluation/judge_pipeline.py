@@ -6,7 +6,7 @@ from typing import Dict, Any, List
 from scientific_review.client import Client
 from scientific_review.utils.utils import extract_json
 from scientific_review.utils.params import get_params
-from scientific_review.utils.prompts import build_prompt
+from scientific_review.utils.prompts import get_prompt_parts
 from scientific_review.utils.logger import setup_logging, get_logger
 
 setup_logging()
@@ -49,7 +49,7 @@ class JudgePipeline:
         Returns:
             Вердикт и результат judge (winner, score_baseline, score_multiagent, reason, raw_output)
         """
-        prompt = build_prompt(
+        system_prompt, user_prompt = get_prompt_parts(
             "judge", 
             text=text, 
             baseline_review=baseline_result.get("review", ""),
@@ -59,8 +59,10 @@ class JudgePipeline:
             human_scores=human_scores,
         )
 
-
-        messages = [{"role": "user", "content": prompt}]
+        messages = [
+            {"role": "system", "content": system_prompt}, 
+            {"role": "user", "content": user_prompt}
+        ]
         
         logger.info("JudgePipeline: отправка запроса")
         response = await self.client.generate(messages, model=params["models"]["judge"])
