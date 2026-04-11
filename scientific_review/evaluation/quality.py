@@ -41,6 +41,17 @@ async def evaluate_single(
 
     Returns:
         Полный результат (baseline, multiagent, metrics, judge)
+
+        {
+            "baseline": ...,
+            "multiagent": ...,
+            "metrics": {
+                "baseline_vs_human": ...,
+                "multiagent_vs_human": ...
+            },
+            "human_scores": human_scores,
+            "judge": ...,
+        }
     """
     try:
         logger.debug("Запускаем пайплайны baseline и multiagent...")
@@ -55,6 +66,7 @@ async def evaluate_single(
             "baseline": None,
             "multiagent": None, 
             "metrics": {},
+            "human_scores": human_scores,
         }
 
         if baseline_pipeline:
@@ -85,7 +97,7 @@ async def evaluate_single(
     if judge_pipeline:
         try:
             logger.debug("Запускаем пайплайн judge...")
-            judge_result = await judge_pipeline.evaluate(text, baseline_result, multiagent_result)
+            judge_result = await judge_pipeline.evaluate(text, baseline_result, multiagent_result, baseline_scores, human_scores)
             result["judge"] = judge_result
         except Exception as e:
             logger.exception(f"Ошибка при выполнении пайплайна judge: {e}")
@@ -137,7 +149,18 @@ async def evaluate_dataset(
     tasks = [asyncio.create_task(sem_task(i, text)) for i, text in enumerate(texts)]
 
     results = await asyncio.gather(*tasks)
-
+    small_results = [
+        {
+            "metrics": r.get("metrics", {}),
+            "review_baseline": r.get("baseline", {}).get("review") if r.get("baseline") else None,
+            "scores_baseline": r.get("baseline", {}).get("scores", []) if r.get("baseline") else None,
+            "review_multiagent": r.get("multiagent", {}).final_review if r.get("multiagent") else None,
+            "scores_multiagent": r.get('multiagent', {}).scores if r.get("multiagent") else None,
+            "judge": r.get("judge"),
+            "human_scores": r.get("human_scores"),
+        }
+        for r in results
+    ]
     # агрегируем метрики
     logger.info(f"Оценка завершена. Вычисляем средние значения метрик...")
     def avg(values: List[float]) -> float:
@@ -145,14 +168,22 @@ async def evaluate_dataset(
 
     baseline_vs_human = [result["metrics"]["baseline_vs_human"] for result in results if "baseline_vs_human" in result["metrics"]]
     multiagent_vs_human = [result["metrics"]["multiagent_vs_human"] for result in results if "multiagent_vs_human" in result["metrics"]]
+    count_multiagent_bigger_baseline = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] > result["metrics"]["baseline_vs_human"])
+    count_baseline_bigger_multiagent = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] < result["metrics"]["baseline_vs_human"])
+    count_winner_multiagent = sum(1 for result in results if result.get("judge", {}).get("winner") == "multiagent")
+    count_winner_baseline = sum(1 for result in results if result.get("judge", {}).get("winner") == "baseline")
 
     final = {
         "num_samples": len(texts),
         "metrics": {
             "baseline_vs_human_avg": avg(baseline_vs_human),
             "multiagent_vs_human_avg": avg(multiagent_vs_human),
+            "multiagent_better_count": count_multiagent_bigger_baseline,
+            "baseline_better_count": count_baseline_bigger_multiagent,
+            "judge_winner_multiagent_count": count_winner_multiagent,
+            "judge_winner_baseline_count": count_winner_baseline,
         },
-        "results": results,
+        "results": small_results,
     }
 
     logger.info(f"Оценка датасета завершена.")

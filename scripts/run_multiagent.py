@@ -29,6 +29,7 @@ async def main():
 
     result = {
         "text": state.text,
+        "messages": state.messages,
         "scores": state.scores,
         "review": state.final_review,
         "verdict": state.verdict,
