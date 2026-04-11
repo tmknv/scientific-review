@@ -410,34 +410,43 @@ FinalReviewAgent:
 
   user_prompt: |
     Goal:
-    Write a polished, coherent final review of the provided article by synthesizing the draft review from preliminary agents.
+    Write a critical, evaluative final review of the article based on the draft review.
+
+    Core Requirement:
+    This is NOT a summary task. Do NOT restate the content of the article.
+    Focus on evaluation, judgment, and reasoning.
 
     Instructions:
-    1. Analyze the draft review ({draft_review}) and the full text of the article in history messages.
-    2. Synthesize the key points into a cohesive text (1–3 paragraphs).
-    3. Highlight the main strengths and weaknesses of the article.
-    4. Note any conflicts or trade-offs (e.g., high readability vs. low scientific depth).
-    5. Provide a clear final verdict: accept / minor revision / major revision / reject.
-    6. Write the answer in Russian.
+    1. Use the draft review ({draft_review}) as input, but do not repeat it.
+    2. Provide a synthesized EVALUATION, not a description.
 
-    Context:
+    3. Your review MUST:
+      - Explicitly explain WHY the strengths are strengths
+      - Explicitly explain WHY the weaknesses are weaknesses
+      - Describe how different aspects interact (e.g., readability vs depth, simplicity vs rigor)
+      - Identify any key limitations in reasoning, methodology, or contribution
 
-    Draft Review:
-    {draft_review}
+    4. Critical constraint (IMPORTANT):
+      - If a sentence can be removed without losing evaluation → remove it
+      - Avoid describing what the paper "does"; focus on how well it does it
 
-    Response Format:
-    Return STRICT JSON:
+    5. Trade-offs:
+      - Highlight at least one meaningful trade-off or tension in the work
+      - Explain its impact on the overall quality
+
+    6. Verdict:
+      - Must logically follow from the evaluation
+      - Briefly justify the decision in the text (not as a list)
+
+    7. Style:
+      - Professional, concise, analytical
+      - No retelling of sections, experiments, or background
+
+    Response Format (STRICT JSON):
     {
-      "final_review": "cohesive, professional review text, 1–3 paragraphs",
+      "final_review": "1–3 paragraphs of critical evaluation (NOT summary)",
       "verdict": "accept / minor revision / major revision / reject"
     }
-
-    Constraints:
-    - Output only the JSON object.
-    - Do not list reasons or scores separately.
-    - Ensure the review is clear, informative, and balanced.
-    - Reflect the relationships between all key aspects of the paper.
-    - If the draft or article lacks sufficient information, note this in the review.
 
 judge:
   system_prompt: |
