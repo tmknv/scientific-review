@@ -225,7 +225,7 @@ def prepare_dataset():
         avg_scores["final_score"] = round(final_score, 3)
 
         # приводим к шкале 0-10
-        avg_scores = {k: round(v * 2, 3) for k, v in avg_scores.items()}
+        #avg_scores = {k: round(v * 2, 3) for k, v in avg_scores.items()}
 
         final_data.append({
             "id": pid,
