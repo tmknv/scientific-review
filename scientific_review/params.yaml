@@ -4,6 +4,8 @@
 models:
   baseline: "openai/gpt-oss-120b:free"
   agent: "nvidia/nemotron-3-nano-30b-a3b:free"
+  # "liquid/lfm-2.5-1.2b-thinking:free"
+  # 
   judge: "openai/gpt-oss-120b:free"
 
 openrouter:

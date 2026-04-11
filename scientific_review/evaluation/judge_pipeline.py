@@ -1,7 +1,7 @@
 # scientific_review/evaluation/judge.py
 # llm-as-judge: сравнение baseline и multi-agent ревью
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from scientific_review.client import Client
 from scientific_review.utils.utils import extract_json
@@ -33,7 +33,11 @@ class JudgePipeline:
         self.client = client
 
 
-    async def evaluate(self, text: str, baseline_result: Dict[str, Any], multiagent_result: Dict[str, Any]) -> Dict[str, Any]:
+    async def evaluate(self, text: str,
+                        baseline_result: Dict[str, Any],
+                        multiagent_result: Dict[str, Any],
+                        baseline_scores: List[float],
+                        human_scores: List[float]) -> Dict[str, Any]:
         """
         Сравнивает два результата и выбирает лучший.
 
@@ -48,8 +52,11 @@ class JudgePipeline:
         prompt = build_prompt(
             "judge", 
             text=text, 
-            baseline_review=baseline_result.get("review", ""), 
-            multiagent_review=multiagent_result.final_review
+            baseline_review=baseline_result.get("review", ""),
+            biseline_score=baseline_scores, 
+            multiagent_review=multiagent_result.final_review,
+            multiagent_score=multiagent_result.scores,
+            human_scores=human_scores,
         )
 
 
