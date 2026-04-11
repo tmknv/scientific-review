@@ -168,12 +168,20 @@ async def evaluate_dataset(
 
     baseline_vs_human = [result["metrics"]["baseline_vs_human"] for result in results if "baseline_vs_human" in result["metrics"]]
     multiagent_vs_human = [result["metrics"]["multiagent_vs_human"] for result in results if "multiagent_vs_human" in result["metrics"]]
+    count_multiagent_bigger_baseline = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] > result["metrics"]["baseline_vs_human"])
+    count_baseline_bigger_multiagent = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] < result["metrics"]["baseline_vs_human"])
+    count_winner_multiagent = sum(1 for result in results if result.get("judge", {}).get("winner") == "multiagent")
+    count_winner_baseline = sum(1 for result in results if result.get("judge", {}).get("winner") == "baseline")
 
     final = {
         "num_samples": len(texts),
         "metrics": {
             "baseline_vs_human_avg": avg(baseline_vs_human),
             "multiagent_vs_human_avg": avg(multiagent_vs_human),
+            "multiagent_better_count": count_multiagent_bigger_baseline,
+            "baseline_better_count": count_baseline_bigger_multiagent,
+            "judge_winner_multiagent_count": count_winner_multiagent,
+            "judge_winner_baseline_count": count_winner_baseline,
         },
         "results": small_results,
     }
