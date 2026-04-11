@@ -344,7 +344,7 @@ class FinalReviewAgent(BaseAgent):
 
     async def run(self, state: State) -> State:
 
-        response = await self.request_model(state, draft_review=state.draft_review)
+        response = await self.request_model(state, draft_review=state.draft_review, scores=state.scores, reasons=state.reasons)
         data = extract_json(response)
 
         final_review = data.get("final_review", response)
