@@ -41,7 +41,7 @@ class BaselinePipeline:
         Returns:
             Результат baseline (scores, verdict, review, raw_output)
         """
-        system_prompt, user_prompt = get_prompt_parts(self.name, text=text)
+        system_prompt, user_prompt = get_prompt_parts(name='baseline', text=text)
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}

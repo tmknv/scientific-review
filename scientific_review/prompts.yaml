@@ -466,7 +466,7 @@ FinalReviewAgent:
       Must be strictly one of:
       accept / revise / reject
 
-    -writing in Russian
+    -writing review in Russian
 
     OUTPUT FORMAT (STRICT JSON):
     {

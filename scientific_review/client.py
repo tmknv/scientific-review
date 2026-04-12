@@ -31,7 +31,7 @@ class Client:
         self,
         base_url: str = params["openrouter"]["base_url"],
         timeout: int = params["openrouter"]["timeout"],
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(3),
+        semaphore: asyncio.Semaphore = asyncio.Semaphore(10),
         rpm_limit: int = 15,
     ):
         self.api_key = settings.OPENROUTER_API_KEY

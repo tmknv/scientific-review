@@ -3,10 +3,12 @@
 
 models:
   baseline: "openai/gpt-oss-120b:free"
-  agent: "nvidia/nemotron-3-nano-30b-a3b:free"
+  agent: "qwen/qwen3-8b"
+  # "nvidia/nemotron-3-nano-30b-a3b:free"
   # "liquid/lfm-2.5-1.2b-thinking:free"
-  # 
-  judge: "openai/gpt-oss-120b:free"
+  # "qwen/qwen3-8b"
+  judge: "xiaomi/mimo-v2-flash"
+  # "openai/gpt-oss-120b:free"
 
 openrouter:
   base_url: "https://openrouter.ai/api/v1/chat/completions"
@@ -14,7 +16,7 @@ openrouter:
 
 evaluation:
   concurrency: 1 # количество параллельных запросов
-  runs: 5 # количество прогонов статьи для оценки stability
+  runs: 10 # количество прогонов статьи для оценки stability
 
 paths:
   quality_results: "runs/quality"

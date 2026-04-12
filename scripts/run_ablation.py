@@ -54,8 +54,8 @@ async def main():
     texts, human_scores = load_dataset(path)
 
     # для теста берем 10 текстов
-    texts = texts[:10]  
-    human_scores = human_scores[:10] if human_scores else None
+    texts = texts[:5]  
+    human_scores = human_scores[:5] if human_scores else None
     
     logger.info(f"Загружено текстов: {len(texts)}")
 

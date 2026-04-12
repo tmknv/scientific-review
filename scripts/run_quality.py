@@ -62,8 +62,8 @@ async def main():
     path = params["paths"]["dataset"] 
 
     texts, human_scores = load_dataset(path)
-    texts = texts[:10]  # для теста берем 10 текстов
-    human_scores = human_scores[:10] if human_scores else None
+    texts = texts[:50]  # для теста берем 50 текстов
+    human_scores = human_scores[:50] if human_scores else None
     logger.info(f"Загружено текстов: {len(texts)}")
 
     await run_quality(texts=texts, human_scores=human_scores)

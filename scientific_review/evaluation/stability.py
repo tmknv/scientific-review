@@ -21,8 +21,8 @@ async def evaluate_stability(
     text: str, 
     baseline_pipeline: BaselinePipeline, 
     multiagent_pipeline: MultiAgentPipeline, 
-    runs: int = 5, 
-    concurrency: int = params["evaluation"]["concurrency"]
+    runs: int = 15, 
+    concurrency: int = 3
 ) -> Dict[str, Any]:
     """
     Stability test
@@ -46,9 +46,10 @@ async def evaluate_stability(
     # concurrency не может быть больше количества прогонов
     concurrency = min(concurrency, runs) 
     semaphore = asyncio.Semaphore(concurrency)
+    semaphore_baseline = asyncio.Semaphore(3)
 
     async def sem_run_baseline():
-        async with semaphore:
+        async with semaphore_baseline:
             return await baseline_pipeline.run(text)
 
     async def sem_run_multiagent():

@@ -50,7 +50,7 @@ async def main():
     path = params["paths"]["dataset"] 
 
     texts, _ = load_dataset(path)
-    text = texts[0]
+    text = texts[1]
 
     await run_stability(text=text)
 

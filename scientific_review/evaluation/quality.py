@@ -5,7 +5,7 @@ import asyncio
 from typing import List, Dict, Any, Optional
 
 from scientific_review.utils.utils import extract_scores
-from scientific_review.evaluation.metrics import spearman_correlation
+from scientific_review.evaluation.metrics import dispersion
 from scientific_review.utils.logger import setup_logging, get_logger
 from scientific_review.utils.params import get_params
 
@@ -91,8 +91,14 @@ async def evaluate_single(
     logger.info("Считаем метрики...")
     if human_scores is not None:
         if baseline_pipeline:
-            result["metrics"]["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
-        result["metrics"]["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
+            result["metrics"]["baseline_vs_human"] = dispersion(baseline_scores, human_scores)
+        result["metrics"]["multiagent_vs_human"] = dispersion(multiagent_scores, human_scores)
+
+    # logger.info("Считаем метрики...")
+    # if human_scores is not None:
+    #     if baseline_pipeline:
+    #         result["metrics"]["baseline_vs_human"] = spearman_correlation(baseline_scores, human_scores)
+    #     result["metrics"]["multiagent_vs_human"] = spearman_correlation(multiagent_scores, human_scores)
 
     if judge_pipeline:
         try:
@@ -113,7 +119,7 @@ async def evaluate_dataset(
     baseline_pipeline: Optional[BaselinePipeline] = None,
     judge_pipeline: Optional[JudgePipeline] = None,
     human_scores_list: Optional[List[List[float]]] = None,
-    concurrency: int = params["evaluation"]["concurrency"],
+    concurrency: int = 5,
 ) -> Dict[str, Any]:
     """
     Оценка датасета. 

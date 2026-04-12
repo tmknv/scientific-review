@@ -59,7 +59,7 @@ def get_ablation_configs() -> Dict[str, List[str]]:
 async def evaluate_ablation(
         texts: List[str], 
         human_scores: List[List[float]], 
-        concurrency: int = params["evaluation"]["concurrency"]
+        concurrency: int = 5
 ) -> Dict[str, Any]:
     """
     Запускает ablation study: убираем агентов и смотрим деградацию.

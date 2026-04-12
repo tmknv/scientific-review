@@ -1,6 +1,7 @@
 # scientific_review/evaluation/metrics.py
 # метрики для оценки качества моделей (baseline vs multi-agent)
 
+from math import sqrt
 from typing import List
 import numpy as np
 from scipy.stats import spearmanr
@@ -9,6 +10,23 @@ from scientific_review.utils.logger import setup_logging, get_logger
 setup_logging()
 logger = get_logger(__name__)
 
+def dispersion(x: List[float], y: List[float]) -> float:
+    """Считает дисперсию между двумя наборами оценок."""
+    if len(x) != len(y):
+        raise ValueError("Длины списков не совпадают")
+    
+    try:
+        n = len(x)
+        total = 0
+
+        for a, b in zip(x, y):
+            total += (a - b) ** 2
+
+        return sqrt(total) / n
+    
+    except Exception as e:
+        logger.error(f"Ошибка при вычислении дисперсии: {e}")
+        return 0.0
 
 def spearman_correlation(x: List[float], y: List[float]) -> float:
     """
