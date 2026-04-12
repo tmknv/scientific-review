@@ -20,9 +20,9 @@ def dispersion(x: List[float], y: List[float]) -> float:
         total = 0
 
         for a, b in zip(x, y):
-            total += (a - b) ** 2
+            total += abs(a - b)
 
-        return sqrt(total) / n
+        return total / n
     
     except Exception as e:
         logger.error(f"Ошибка при вычислении дисперсии: {e}")
