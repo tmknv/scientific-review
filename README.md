@@ -1,110 +1,136 @@
-# Scientific Review - Автоматическое рецензирование научных статей
+# Scientific Review: Multi-Agent vs LLM
 
-Проект для сравнительного анализа мультиагентной системы и большой языковой модели в задаче автоматического рецензирования научных текстов.
+Сравнительный анализ мультиагентной системы (на базе SLM) и одиночной LLM  
+в задаче автоматического рецензирования научных текстов.
 
-## Реализованный код
+## Описание проекта
 
-### Основные модули (`scientific_review/`)
-- **config.py** - загрузка переменных окружения и конфигурации из `prompts.yaml`
-- **client.py** - унифицированный клиент для работы с OpenRouter API 
-- **utils.py** - утилиты: работа с JSON, сохранение файлов, расчёт оценок
+В проекте реализованы два подхода к автоматическому рецензированию научных статей:
 
-### Мультиагентная система (`scientific_review/agents/`)
-- **criteria_agents.py** - четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
-- **review_agents.py** - агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
-- **multiagent_pipeline.py** - оркестрация работы всех агентов в последовательный pipeline
-- **state.py** - общее состояние для обмена данными между агентами (текст, оценки, рецензии)
-- **tools.py** - расширяемый модуль для инструментов агентов (например, поиск для NoveltyAgent)
+### Baseline (LLM)
+- Один запрос к большой языковой модели.
+- Результат содержит:
+  - оценки по всем критериям,
+  - итоговый score,
+  - полный review и verdict.
 
-### Базовый подход (`scientific_review/baseline/`)
-- **baseline_pipeline.py** - простой baseline: один вызов монолитной LLM для оценки и рецензии
+### Multi-Agent (SLM)
+- Набор специализированных агентов:
+  - `NoveltyAgent`
+  - `ScientificityAgent`
+  - `ReadabilityAgent`
+  - `ComplexityAgent`
+- Генерация рецензии выполняется в два этапа:
+  - `RawReviewAgent`
+  - `FinalReviewAgent`
 
-### Скрипты запуска (`scripts/`)
-- **run_baseline.py** - запуск baseline pipeline с примером использования
-- **run_multiagent.py** - запуск multiagent pipeline с примером использования
-### 3. Запустить pipeline
+Декомпозиция задачи на специализированные агенты обеспечивает более управляемое, стабильное и объяснимое поведение системы.
 
-#### Запуск baseline подхода:
-```bash
-poetry run python scripts/run_baseline.py
+
+## Гипотеза
+
+Мультиагентная система на базе SLM:
+- обеспечивает более стабильные результаты,
+- выдает оценки более близкие к экспертным (human) оценкам,
+- обладает более прозрачной и интерпретируемой структурой оценки.
+
+
+## Архитектура
+
+### Multi-Agent Pipeline
+
+```
+├── NoveltyAgent
+├── ScientificityAgent
+├── ReadabilityAgent
+└── ComplexityAgent
+         ↓
+   RawReviewAgent
+         ↓
+   FinalReviewAgent
+         ↓
+   Final State (scores + review + verdict)
 ```
 
-#### Запуск мультиагентного подхода:
-```bash
+
+## Критерии оценки
+
+- **Novelty** – новизна исследования
+- **Scientificity** – научная обоснованность
+- **Readability** – читаемость и ясность изложения
+- **Complexity** – уровень сложности материала
+
+
+## Эксперименты
+
+### E1: Quality
+Сравнение baseline и multi-agent на полном датасете.  
+Метрики: MAE (Mean Absolute Error) по отношению к human labels, LLM-as-a-Judge для оценки ревью.
+
+### E2: Stability
+15 независимых прогонов одной и той же статьи.  
+Измеряется inter-run variance результатов baseline и multi-agent.
+
+### E3: Ablation Study
+Отключение отдельных агентов и проверка деградации качества.
+Для каждой конфигурации (1 агент, 2 агента, 3 агента, 4 агента = full) генерируется review через multi-agent pipeline.  
+Каждый multi-agent review сравнивается с baseline review с помощью LLM-as-a-Judge.  
+Рассчитывается **Win Rate** – доля случаев, где LLM-as-a-Judge выбрал multi-agent review лучше baseline.
+Анализируется зависимость:  
+- X – количество агентов (1, 2, 3, 4)  
+- Y – средний win-rate по конфигурациям с данным числом агентов  
+
+
+## Метрики
+
+1. **MAE (Mean Absolute Error)** – среднее арифметическое отклонение оценок модели от оценок экспертов.
+2. **LLM-as-a-Judge** – одна языковая модель проверяет и оценивает ответы другой модели по заданным критериям (сравнение ревью baseline и multi-agent).
+3. **Inter-run Variance** – межпрогонная дисперсия, разброс результатов при многократных запусках на одних и тех же данных.
+
+
+## Запуск экспериментов
+
+```
+# E1: Quality
+poetry run python scripts/run_quality.py
+
+# E2: Stability
+poetry run python scripts/run_stability.py
+
+# E3: Ablation
+poetry run python scripts/run_ablation.py
+```
+
+Результаты сохраняются в папку `runs/`:
+- `runs/quality`
+- `runs/stability`
+- `runs/ablation`
+
+## Запуск pipeline
+
+```
+# Запуск baseline pipeline:
+poetry run python scripts/run_baseline.py
+
+# Запуск multi-agent pipeline:
 poetry run python scripts/run_multiagent.py
 ```
 
-## Результаты
+Результаты сохраняются в папку `runs/`:
+- `runs/baseline`
+- `runs/multiagent`
 
-Результаты экспериментов сохраняются в JSON формате:
-- результаты baseline сохраняются в `runs/baseline/`
-- результаты multi-agent сохраняются в `runs/multiagent/`
 
-Каждый результат содержит:
-- **scores** - числовые оценки по различным критериям
-- **review** - текст рецензии
-- **verdict** - вердикт (accept/reject/minor/major revisions)
-- **agents_outputs** - детальные выходы каждого агента
+## Ключевые особенности
 
-## Вывод в терминал
+- Асинхронная обработка (`asyncio`)
+- Параллельный запуск агентов
+- Оркестрация через LangGraph
+- JSON-артефакты всех результатов для воспроизводимости исследований
 
-При запуске скриптов в терминал выводится:
 
-### Для Baseline Pipeline:
-```
-{
-  "scores": {
-    "novelty": 9,
-    "scientificity": 6,
-    "readability": 8,
-    "complexity": 5
-    "final_score": 7
-  },
-  "review": "Детальный текст рецензии...",
-  "verdict": "accept"
-  "raw_output": " ... "
-}
-Saved to: runs/baseline/20260325_120543_123456.json
-```
+## Основные результаты
 
-### Для Multi-Agent Pipeline:
-```
-{
-  "text": " ... "
-  "scores": {
-    "novelty": 9,
-    "scientificity": 6,
-    "readability": 8,
-    "complexity": 5
-    "final_score": 7
-  },
-  "draft_review": " ... "
-  "final_review": "Детальный текст рецензии от агентов...",
-  "verdict": "accept",
-  "agents_outputs": [...]
-  }
-  "metadata": {...}
-}
-Saved to: runs/multiagent/20260325_120543_654321.json
-```
-
-## Реализованный код
-
-### Основные модули (`scientific_review/`)
-- **config.py** - загрузка переменных окружения и конфигурации из `prompts.yaml`
-- **client.py** - унифицированный клиент для работы с OpenRouter API 
-- **utils.py** - утилиты: работа с JSON, сохранение файлов, расчёт оценок
-
-### Мультиагентная система (`scientific_review/agents/`)
-- **criteria_agents.py** - четыре агента для оценки критериев: NoveltyAgent, ScientificityAgent, ReadabilityAgent, ComplexityAgent
-- **review_agents.py** - агенты для составления рецензии: RawReviewAgent и FinalReviewAgent
-- **multiagent_pipeline.py** - оркестрация работы всех агентов в последовательный pipeline
-- **state.py** - общее состояние для обмена данными между агентами (текст, оценки, рецензии)
-- **tools.py** - расширяемый модуль для инструментов агентов
-
-### Базовый подход (`scientific_review/baseline/`)
-- **baseline_pipeline.py** - простой baseline: однозвездный вызов LLM для оценки и рецензии
-
-### Скрипты запуска (`scripts/`)
-- **run_baseline.py** - запуск baseline pipeline с примером использования
-- **run_multiagent.py** - запуск мультиагентного pipeline с примером использования
+- Multi-agent система превосходит baseline по MAE (качество оценок) и LLM-as-a-Judge (качество ревью).
+- Multi-agent система демонстрирует существенно меньшую межпрогонную дисперсию (выше стабильность).
+- Win Rate растет с увеличением количества агентов; разбиение задачи даёт значительный прирост качества.
