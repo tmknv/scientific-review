@@ -67,3 +67,6 @@ ehthumbs.db
 
 # Данные
 data/raw
+
+# Запуски
+runs/
