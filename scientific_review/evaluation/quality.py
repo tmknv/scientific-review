@@ -174,8 +174,8 @@ async def evaluate_dataset(
 
     baseline_vs_human = [result["metrics"]["baseline_vs_human"] for result in results if "baseline_vs_human" in result["metrics"]]
     multiagent_vs_human = [result["metrics"]["multiagent_vs_human"] for result in results if "multiagent_vs_human" in result["metrics"]]
-    count_multiagent_bigger_baseline = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] > result["metrics"]["baseline_vs_human"])
-    count_baseline_bigger_multiagent = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] < result["metrics"]["baseline_vs_human"])
+    count_multiagent_bigger_baseline = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] < result["metrics"]["baseline_vs_human"])
+    count_baseline_bigger_multiagent = sum(1 for result in results if "multiagent_vs_human" in result["metrics"] and "baseline_vs_human" in result["metrics"] and result["metrics"]["multiagent_vs_human"] > result["metrics"]["baseline_vs_human"])
     count_winner_multiagent = sum(1 for result in results if result.get("judge", {}).get("winner") == "multiagent")
     count_winner_baseline = sum(1 for result in results if result.get("judge", {}).get("winner") == "baseline")
 
