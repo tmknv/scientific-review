@@ -64,3 +64,9 @@ __pycache__/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# Данные
+data/raw
+
+# Запуски
+runs/

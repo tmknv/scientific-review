@@ -1,0 +1,40 @@
+# scientific_review/params.yaml
+# параметры приложения
+
+models:
+  baseline: "openai/gpt-oss-120b:free"
+  agent: "qwen/qwen3-8b"
+  # "nvidia/nemotron-3-nano-30b-a3b:free"
+  # "liquid/lfm-2.5-1.2b-thinking:free"
+  # "qwen/qwen3-8b"
+  judge: "xiaomi/mimo-v2-flash"
+  # "openai/gpt-oss-120b:free"
+
+openrouter:
+  base_url: "https://openrouter.ai/api/v1/chat/completions"
+  timeout: 60
+
+evaluation:
+  concurrency: 1 # количество параллельных запросов
+  runs: 10 # количество прогонов статьи для оценки stability
+
+paths:
+  quality_results: "runs/quality"
+  stability_results: "runs/stability"
+  ablation_results: "runs/ablation"
+  multiagent_results: "runs/multiagent"
+  baseline_results: "runs/baseline"
+  dataset: "data/processed/peerread.json"
+
+criteria:
+  order: # порядок критериев
+    - novelty
+    - scientificity
+    - readability
+    - complexity
+  
+  names: # имена критериальных агентов
+    - NoveltyAgent
+    - ScientificityAgent
+    - ReadabilityAgent
+    - ComplexityAgent
